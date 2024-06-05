@@ -53,13 +53,13 @@ export function initGL() {
       Z = vec2(Z.x * Z.x - Z.y * Z.y, 2.0 * Z.x * Z.y) + C;
       n++;
     }
-
+    
     if (n < 2.0)
       OutColor = vec4(0.0);
     else if (n > 2.0 && n < 5.0)
-      OutColor = vec4(n * 40.0, n / 30.0, n * (20.0 + 5.0 * abs(sin(Time + 3.0))), 0.5); 
+      OutColor = vec4(n * 80.0, n / 30.0, n * (20.0 + 120.0 * abs(sin(Time + 3.0))), 0.5); 
     else
-      OutColor = vec4(n * 40.0, n / 30.0, n * (20.0 + 5.0 * abs(sin(Time + 3.0))), 1.0); 
+      OutColor = vec4(n * 40.0, n / 100.0, n * (20.0 + 5.0 * abs(sin(Time + 3.0))), 1.0); 
     //OutColor = vec4(n / 80.0, n / 60.0, n / (20.0 + 5.0 * abs(sin(Time + 3.0))), n / 255.0); 
   }
   `;
