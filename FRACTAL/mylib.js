@@ -20,9 +20,18 @@ export function initGL() {
  
   void main( void )
   {
-    gl_Position = vec4(InPosition, 1);
-    gl_Position.x += 0.1 * sin(Time);
-    DrawPos = InPosition.xy;
+    vec2 p[4] = 
+      vec2[4](vec2(-1.0, 1.0),
+              vec2(-1.0, -1.0),
+              vec2(1.0, 1.0),
+              vec2(1.0, -1.0));
+    vec2 t[4] = 
+      vec2[4](vec2(-2.0, 2.0),
+              vec2(-2.0, -2.0),
+              vec2(2.0, 2.0),
+              vec2(2.0, -2.0));
+    gl_Position = vec4(p[gl_VertexID].xy, 0.0, 1.0);
+    DrawPos.xy = t[gl_VertexID];
   }
   `;
   let fs_txt =
@@ -32,10 +41,26 @@ export function initGL() {
   
   in vec2 DrawPos;
   uniform float Time;
- 
+
   void main( void )
   {
-    OutColor = vec4(1.0 * sin(DrawPos.x * 8.0 + Time * 5.0) * sin(DrawPos.y * 8.0 + Time * 2.0), abs(sin(Time)), 1.0, 1.0);
+    vec2 Z = DrawPos;
+    vec2 C = vec2(0.35 + 0.05 * sin(2.0 * Time * 1.3), 0.35 + 0.05 * sin(2.0 * Time * 0.8));
+    float n = 0.0;
+
+    while (n < 250.0 && length(Z) < 2.0)
+    {
+      Z = vec2(Z.x * Z.x - Z.y * Z.y, 2.0 * Z.x * Z.y) + C;
+      n++;
+    }
+
+    if (n < 2.0)
+      OutColor = vec4(0.0);
+    else if (n > 2.0 && n < 5.0)
+      OutColor = vec4(n * 40.0, n / 30.0, n * (20.0 + 5.0 * abs(sin(Time + 3.0))), 0.5); 
+    else
+      OutColor = vec4(n * 40.0, n / 30.0, n * (20.0 + 5.0 * abs(sin(Time + 3.0))), 1.0); 
+    //OutColor = vec4(n / 80.0, n / 60.0, n / (20.0 + 5.0 * abs(sin(Time + 3.0))), n / 255.0); 
   }
   `;
   let
