@@ -11,12 +11,8 @@ class _vec3{
             if (y == undefined || z == undefined)
                 this.x = x, this.y = x, this.z = x;
             else
-                this.x = x.x, this.y = y, this.z = z;
+                this.x = x, this.y = y, this.z = z;
     } // End of 'constructor' function
-
-    dot(v) {
-        return this.x * v.x + this.y * v.y + this.z * v.z;
-    } // End of 'dot' function
 
     add(v) {
         if (typeof v == "number")
@@ -24,8 +20,47 @@ class _vec3{
         return vec3(this.x + v.x, this.y + v.y, this.z + v.z);
     } // End of 'add' function
 
+    sub(v) {
+        if (typeof v == "number")
+            return vec3(this.x - v, this.y - v, this.z - v);
+        return vec3(this.x - v.x, this.y - v.y, this.z - v.z);
+    } // End of 'sub' function
+
+    mul(v) {
+        if (typeof v == "number")
+            return vec3(this.x * v, this.y * v, this.z * v);
+        return this.x * v.x + this.y * v.y + this.z * v.z;
+    } // End of 'mul' function
+
+    div(v) {
+        if (typeof v == "number")
+            return vec3(this.x / v, this.y / v, this.z / v);
+    } // End of 'div' function
+
+    neg(v) {
+        return vec3(-this.x, - this.y, -this.z);
+    } // End of 'neg' function
+
+    /*
+    dot(v) {
+        return this.x * v.x + this.y * v.y + this.z * v.z;
+    } // End of 'dot' function
+     */
+
+    len() {
+        len = mul(this, this);
+
+        if (len == 1 || len == 0)
+            return this.len;
+        return Math.sqrt(len);
+    } // End of 'len' function
+
+    len2() {
+        return mul(this, this);
+    } // End of 'len2' function
+
     normalize() {
-        let len = this.x * this.x + this.y * this.y + this.z * this.z;
+        let len = mul(this, this);
 
         if (len != 0 && len != 1) {
             len = Math.sqrt(len);
