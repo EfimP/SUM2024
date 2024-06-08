@@ -1,5 +1,4 @@
-import * as mth from "./math.js";
-import { vec3 } from './vec3.js';
+import * as mth from "./mth/math.js";
 
 function main() {
   const element = document.querySelector("#glcanvas");

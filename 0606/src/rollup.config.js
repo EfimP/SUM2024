@@ -1,6 +1,4 @@
-//import resolve from "@rollup/plugin-node-resolve";
-
-module.exports = {
+export default {
     input: "main.js",
     output: {
         dir: "output",
