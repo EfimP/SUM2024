@@ -1,15 +1,9 @@
-import * as mth from "./mth/math.js";
-
-class _render{
-  constructor(canvasId) {
-    this.canvas = document.getElementById(canvasId);
-    const gl = element.getContext("webgl2");
-    this.gl = gl;
-
-  }
-}
+import * as mth from "./math.js";
 
 function main() {
+  const element = document.querySelector("#glcanvas");
+  const gl = element.getContext("webgl2");
+
   if (gl === null) {
     alert("WebGL2 not supported");
     return;

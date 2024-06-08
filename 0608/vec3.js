@@ -31,12 +31,12 @@ class _vec3{
     mul(v) {
         if (typeof v == "number")
             return vec3(this.x * v, this.y * v, this.z * v);
-        else if (v.length == 4){
+        else if (v.length == 16){
             let w = this.x * v.A03 + this.y * v.A13 + this.z * v.A23 + v.A33;
 
-            return vec3((this.x * v.m[0][0] + this.y * v.m[1][0] + this.z * v.m[2][0] + v.m[3][0]) / w,
-                        (this.x * v.m[0][1] + this.y * v.m[1][1] + this.z * v.m[2][1] + v.m[3][1]) / w,
-                        (this.x * v.m[0][2] + this.y * v.m[1][2] + this.z * v.m[2][2] + v.m[3][2]) / w);
+            return vec3((this.x * v.A00 + this.y * v.A10 + this.z * v.A20 + v.A30) / w,
+                        (this.x * v.A01 + this.y * v.A11 + this.z * v.A21 + v.A31) / w,
+                        (this.x * v.A02 + this.y * v.A12 + this.z * v.A22 + v.A32) / w);
         }
         return this.x * v.x + this.y * v.y + this.z * v.z;
     } // End of 'mul' function
@@ -74,9 +74,9 @@ class _vec3{
     } // End of 'normalize' function
 
     transform(v) {
-        return vec3(this.x * v.m[0][0] + this.y * v.m[1][0] + this.z * v.m[2][0],
-                    this.x * v.m[0][1] + this.y * v.m[1][1] + this.z * v.m[2][1],
-                    this.x * v.m[0][2] + this.y * v.m[1][2] + this.z * v.m[2][2]); 
+        return vec3(this.x * v.A00 + this.y * v.A10 + this.z * v.A20,
+                    this.x * v.A01 + this.y * v.A11 + this.z * v.A21,
+                    this.x * v.A02 + this.y * v.A12 + this.z * v.A22); 
     } // End of 'transform' function
 
     cross(v) {
@@ -98,14 +98,6 @@ class _vec3{
                          [v, v, v, 1]]);                        
     } // End of 'translate' function    
 
-    scale(v) {
-        return mat4([[v.x, 0, 0, 0],
-                     [0, v.y, 0, 0],
-                     [0, 0, v.z, 0],
-                     [0, 0, 0, 1]]);                        
-
-    } // End of 'scale' function
-
     view(loc, at, up) {
         let dir = dir.sub(at, loc).normalize();
         let right = right.cross(dir, up).normalize();
@@ -118,25 +110,11 @@ class _vec3{
         
         return m; 
     } // End of 'view' function
-    
-    frustum(l, r, b, t, n, f) {
-        return mat4((2 * n) / (r - l), 0, 0, 0,
-                     0, (2 * n) / (t - b), 0, 0,
-                     (r + l) / (r - l), (t + b) / (t - b), (-((f + n) / (f - n))), (-1),
-                     0, 0, (-((2 * n * f) / (f - n))), 0);
-    } /* End of 'frustum' function */
-      
-    ortho(l, r, b, t, n, f) {
-        return mat4(2 / (r - l), 0, 0, 0,
-                    0, 2 / (t - b), 0, 0,
-                    0, 0, (-2) / (f - n), 0,
-                    (-((r + l) / (r - l))), (-((t + b) / (t - b))), (-((f + n) / (f - n))), 1);
-    } // Enf of 'ortho' function
 
     pointtrans(v) {
-        return vec3(this.x * v.m[0][0] + this.y * v.m[1][0] + this.z * v.m[2][0] + v.m[3][0],
-                    this.x * v.m[0][1] + this.y * v.m[1][1] + this.z * v.m[2][1] + v.m[3][1],
-                    this.x * v.m[0][2] + this.y * v.m[1][2] + this.Z * v.m[2][2] + v.m[3][2]);
+        return vec3(this.x * v.A00 + this.y * v.A10 + this.z * v.A20 + v.A30,
+                    this.x * v.A01 + this.y * v.A11 + this.z * v.A21 + v.A31,
+                    this.x * v.A02 + this.y * v.A12 + this.Z * v.A22 + v.A32);
     } // End of 'pointtrans' function
 } // End of 'vec3' class
 
