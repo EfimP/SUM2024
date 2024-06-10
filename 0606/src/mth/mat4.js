@@ -23,66 +23,60 @@ class _mat4{
     } // End of 'constructor' function
         
     mul(m) {
-        let r = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
-        try {
-            r[0][0] = this.m[0][0] * m.m[0][0] + this.m[0][1] * m.m[1][0] + this.m[0][2] * m.m[2][0] +
+        let r = mat4();
+
+        r.m[0][0] = this.m[0][0] * m.m[0][0] + this.m[0][1] * m.m[1][0] + this.m[0][2] * m.m[2][0] +
             this.m[0][3] * m.m[3][0];
         
-        r[0][1] = this.m[0][0] * m.m[0][1] + this.m[0][1] * m.m[1][1] + this.m[0][2] * m.m[2][1] +
+        r.m[0][1] = this.m[0][0] * m.m[0][1] + this.m[0][1] * m.m[1][1] + this.m[0][2] * m.m[2][1] +
             this.m[0][3] * m.m[3][1];
         
-        r[0][2] = this.m[0][0] * m.m[0][2] + this.m[0][1] * m.m[1][2] + this.m[0][2] * m.m[2][2] +
+        r.m[0][2] = this.m[0][0] * m.m[0][2] + this.m[0][1] * m.m[1][2] + this.m[0][2] * m.m[2][2] +
             this.m[0][3] * m.m[3][2];
         
-        r[0][3] = this.m[0][0] * m.m[0][3] + this.m[0][1] * m.m[1][3] + this.m[0][2] * m.m[2][3] +
+        r.m[0][3] = this.m[0][0] * m.m[0][3] + this.m[0][1] * m.m[1][3] + this.m[0][2] * m.m[2][3] +
             this.m[0][3] * m.m[3][3];
         
         
-        r[1][0] = this.m[1][0] * m.m[0][0] + this.m[1][1] * m.m[1][0] + this.m[1][2] * m.m[2][0] +
+        r.m[1][0] = this.m[1][0] * m.m[0][0] + this.m[1][1] * m.m[1][0] + this.m[1][2] * m.m[2][0] +
             this.m[1][3] * m.m[3][0];
         
-        r[1][1] = this.m[1][0] * m.m[0][1] + this.m[1][1] * m.m[1][1] + this.m[1][2] * m.m[2][1] +
+        r.m[1][1] = this.m[1][0] * m.m[0][1] + this.m[1][1] * m.m[1][1] + this.m[1][2] * m.m[2][1] +
             this.m[1][3] * m.m[3][1];
         
-        r[1][2] = this.m[1][0] * m.m[0][2] + this.m[1][1] * m.m[1][2] + this.m[1][2] * m.m[2][2] +
+        r.m[1][2] = this.m[1][0] * m.m[0][2] + this.m[1][1] * m.m[1][2] + this.m[1][2] * m.m[2][2] +
             this.m[1][3] * m.m[3][2];
         
-        r[1][3] = this.m[1][0] * m.m[0][3] + this.m[1][1] * m.m[1][3] + this.m[1][2] * m.m[2][3] +
+        r.m[1][3] = this.m[1][0] * m.m[0][3] + this.m[1][1] * m.m[1][3] + this.m[1][2] * m.m[2][3] +
             this.m[1][3] * m.m[3][3];
         
         
-        r[2][0] = this.m[2][0] * m.m[0][0] + this.m[2][1] * m.m[1][0] + this.m[2][2] * m.m[2][0] +
+        r.m[2][0] = this.m[2][0] * m.m[0][0] + this.m[2][1] * m.m[1][0] + this.m[2][2] * m.m[2][0] +
             this.m[2][3] * m.m[3][0];
         
-        r[2][1] = this.m[2][0] * m.m[0][1] + this.m[2][1] * m.m[1][1] + this.m[2][2] * m.m[2][1] +
+        r.m[2][1] = this.m[2][0] * m.m[0][1] + this.m[2][1] * m.m[1][1] + this.m[2][2] * m.m[2][1] +
             this.m[2][3] * m.m[3][1];
         
-        r[2][2] = this.m[2][0] * m.m[0][2] + this.m[2][1] * m.m[1][2] + this.m[2][2] * m.m[2][2] +
+        r.m[2][2] = this.m[2][0] * m.m[0][2] + this.m[2][1] * m.m[1][2] + this.m[2][2] * m.m[2][2] +
             this.m[2][3] * m.m[3][2];
         
-        r[2][3] = this.m[2][0] * m.m[0][3] + this.m[2][1] * m.m[1][3] + this.m[2][2] * m.m[2][3] +
+        r.m[2][3] = this.m[2][0] * m.m[0][3] + this.m[2][1] * m.m[1][3] + this.m[2][2] * m.m[2][3] +
             this.m[2][3] * m.m[3][3];
         
         
-        r[3][0] = this.m[3][0] * m.m[0][0] + this.m[3][1] * m.m[1][0] + this.m[3][2] * m.m[2][0] +
+        r.m[3][0] = this.m[3][0] * m.m[0][0] + this.m[3][1] * m.m[1][0] + this.m[3][2] * m.m[2][0] +
             this.m[3][3] * m.m[3][0];
         
-        r[3][1] = this.m[3][0] * m.m[0][1] + this.m[3][1] * m.m[1][1] + this.m[3][2] * m.m[2][1] +
+        r.m[3][1] = this.m[3][0] * m.m[0][1] + this.m[3][1] * m.m[1][1] + this.m[3][2] * m.m[2][1] +
             this.m[3][3] * m.m[3][1];
         
-        r[3][2] = this.m[3][0] * m.m[0][2] + this.m[3][1] * m.m[1][2] + this.m[3][2] * m.m[2][2] +
+        r.m[3][2] = this.m[3][0] * m.m[0][2] + this.m[3][1] * m.m[1][2] + this.m[3][2] * m.m[2][2] +
             this.m[3][3] * m.m[3][2];
         
-        r[3][3] = this.m[3][0] * m.m[0][3] + this.m[3][1] * m.m[1][3] + this.m[3][2] * m.m[2][3] +
+        r.m[3][3] = this.m[3][0] * m.m[0][3] + this.m[3][1] * m.m[1][3] + this.m[3][2] * m.m[2][3] +
             this.m[3][3] * m.m[3][3];
-                    
-        } catch (error) {
-            console.log('error');
-            console.log(m);
-            console.log(m[0]);
-            console.log(m[0][0]);            
-        }
-        return r;
+
+        return r;            
     } // End of 'mul' function
 
     determ3x3(A11, A12, A13,
@@ -215,36 +209,36 @@ class _mat4{
     } // End of 'rotate' function
 
     rotateX(angle) {
-        let s = Math.sin(a);
-        let c = Math.cos(a);
-        let a = angle * Math.PI / 180.0;
+        let a = angle * Math.PI / 180.0,
+            s = Math.sin(a),
+            c = Math.cos(a);
 
-        return mat4([[1, 0, 0, 0],
-                     [0, c, s, 0],
-                     [0, -s, co, 0],
-                     [0, 0, 0, 1]]);
-    } // End of 'rotateZ' function
+        return mat4(1, 0, 0, 0,
+                    0, c, s, 0,
+                    0, -s, c, 0,
+                    0, 0, 0, 1);
+    } // End of 'rotateX' function
 
     rotateY(angle) {
-        let s = Math.sin(a);
-        let c = Math.cos(a);
-        let a = angle * Math.PI / 180.0;
+        let a = angle * Math.PI / 180.0,
+            s = Math.sin(a),
+            c = Math.cos(a);
 
-        return mat4([[c, 0, -s, 0],
-                     [0, 1, 0, 0],
-                     [s, 0, co, 0],
-                     [0, 0, 0, 1]]);
+        return mat4(c, 0, -s, 0,
+                    0, 1, 0, 0,
+                    s, 0, c, 0,
+                    0, 0, 0, 1);
     } // End of 'rotateY' function
 
     rotateZ(angle) {
-        let s = Math.sin(a);
-        let c = Math.cos(a);
-        let a = angle * Math.PI / 180.0;
+        let a = angle * Math.PI / 180.0,
+            s = Math.sin(a),
+            c = Math.cos(a);
 
-        return mat4([[c, s, 0, 0],
-                     [-s, c, 0, 0],
-                     [0, 0, 1, 0],
-                     [0, 0, 0, 1]]);
+        return mat4(c, s, 0, 0,
+                    -s, c, 0, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1);
     } // End of 'rotateZ' function
     
     toArray() {

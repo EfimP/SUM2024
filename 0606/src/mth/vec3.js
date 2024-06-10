@@ -3,7 +3,7 @@ import { mat4 } from "./mat4.js";
 class _vec3{
     constructor(x, y, z) {
         if (x == undefined)
-            rhis.x = 0, this.y = 0, this.z = 0;
+            this.x = 0, this.y = 0, this.z = 0;
         else if (typeof x == 'object')
             if (x.length == 3)
                 this.x = x[0], this.y = x[1], this.z = x[2];
@@ -64,7 +64,7 @@ class _vec3{
     } // End of 'len2' function
 
     normalize() {
-        let len = mul(this, this);
+        let len = this.mul(this);
 
         if (len != 0 && len != 1) {
             len = Math.sqrt(len);
@@ -107,16 +107,14 @@ class _vec3{
     } // End of 'scale' function
 
     view(loc, at, up) {
-        let dir = dir.sub(at, loc).normalize();
-        let right = right.cross(dir, up).normalize();
-        let up1 = up.cross(right, dir).normalize();
+        let dir = at.sub(loc).normalize();
+        let right = dir.cross(up).normalize();
+        let up1 = right.cross(dir).normalize();
 
-        let m = [[right.X, up1.X, -dir.X, 0],
-                 [right.Y, up1.Y, -dir.Y, 0], 
-                 [right.Z, up1.Z, -dir.Z, 0],
-                 [-right.mul(loc, right), -right.mul(loc, up), right.mul(loc, dir), 1]];
-        
-        return m; 
+        return mat4(right.x, up1.x, -dir.x, 0,
+                    right.y, up1.y, -dir.y, 0, 
+                    right.z, up1.z, -dir.z, 0,
+                    -right.mul(loc), -loc.mul(up1), loc.mul(dir), 1);
     } // End of 'view' function
     
     frustum(l, r, b, t, n, f) {

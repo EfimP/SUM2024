@@ -5,9 +5,16 @@
         <meta charset="utf-8" />
         <!--<link rel="shortcut icon" href="../bin/C.BMP" type="image/BMP" />-->
 
-        <script type="module" src="./output/main.js"></script>
+        <script src="./output/main.js"></script>
     </head>
     <body>
-        <canvas id="glcanvas" width="1400" height="900"></canvas>
+        <br />FPS: <div id="fps">30</div>
+        <canvas id="glcanvas" width="1400" height="900" onmousewheel="wheel(this, event)"></canvas>
+        <script>
+            function wheel(a, b) {
+                let t = a.id;
+                b.preventDefault();
+            }
+        </script>
     </body>
 </html>
