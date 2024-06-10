@@ -1,5 +1,6 @@
 import { vec3, mat4 } from "./mth/math.js";
-import { Timer } from "./anim/timer.js"
+import { Timer } from "./anim/timer.js";
+import { createCube } from "./anim/prim.js";
 
 class _render{
   frameData = [0, 0, 0, 0];
@@ -57,7 +58,7 @@ class _render{
 
     void main( void )
     {
-      gl_Position = /*MatrWorld */ MatrVP * vec4(InPosition, 1.0);
+      gl_Position = MatrWorld * MatrVP * vec4(InPosition, 1.0);
       DrawPos = InPosition.xy;
     }
     `;
@@ -76,7 +77,7 @@ class _render{
 
     void main( void )
     {
-      OutColor = vec4(1.0, 0.0, 0.0, 1.0);
+      OutColor = vec4(0.117, 0.23, 0.723, 1.0);
     }
     `;
     let
@@ -93,7 +94,7 @@ class _render{
 
     // Veretex buffer
     const size = 0.8;
-    const vertexes = [-size, size, -0.1, -size, -size, -0.1, size, size, -0.1, size, -size, -0.1];
+    const vertexes = createCube(size); //[-size, size, -0.1, -size, -size, -0.1, size, size, -0.1, size, -size, -0.1];
     const posLoc = gl.getAttribLocation(prg, "InPosition");
     let vertexArray = gl.createVertexArray();
     gl.bindVertexArray(vertexArray);
@@ -131,7 +132,7 @@ class _render{
 
     // Matrix of projection
     const WorldLoc = gl.getUniformLocation(prg, "MatrWorld");
-    gl.uniformMatrix4fv(WorldLoc, false, new Float32Array(mat4().rotateY(Math.sin(this.timer)).toArray()));
+    gl.uniformMatrix4fv(WorldLoc, false, new Float32Array(mat4().rotateY(Math.sin(this.timer.localTime)).toArray()));
   }
 
   projSet()
@@ -152,7 +153,7 @@ class _render{
 
   render() {
     const gl = this.gl;
-    gl.clearColor(0, 1, 0, 1);
+    gl.clearColor(0.12, 0.85, 0.970, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.clear(gl.DEPTH_BUFFER_BIT);
     gl.enable(gl.DEPTH_TEST);
@@ -177,6 +178,7 @@ class _render{
   mainLoop() {
     const draw = () => {
       this.render();
+      this.timer.response();
       window.requestAnimationFrame(draw);
     };
     draw();

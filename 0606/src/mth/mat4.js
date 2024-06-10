@@ -105,91 +105,91 @@ class _mat4{
     } // End of 'determ' function
 
     inverse() {
-        let r;
+        let r = mat4();
         let det = this.m.determ();
 
         if (det == 0)
             return mat4();
 
         /* build adjoint matrix */
-        r[0][0] =
+        r.m[0][0] =
             +this.m.determ3x3(this.m[1][1], this.m[1][2], this.m[1][3],
                               this.m[2][1], this.m[2][2], this.m[2][3],
                               this.m[3][1], this.m[3][2], this.m[3][3]) / det;
 
-        r[1][0] =
+        r.m[1][0] =
             -this.m.determ3x3(this.m[1][0], this.m[1][2], this.m[1][3],
                               this.m[2][0], this.m[2][2], this.m[2][3],
                               this.m[3][0], this.m[3][2], this.m[3][3]) / det;
 
-        r[2][0] =
+        r.m[2][0] =
             +this.m.determ3x3(this.m[1][0], this.m[1][1], this.m[1][3],
                               this.m[2][0], this.m[2][1], this.m[2][3],
                               this.m[3][0], this.m[3][1], this.m[3][3]) / det;
 
-        r[3][0] =
+        r.m[3][0] =
             -this.m.determ3x3(this.m[1][0], this.m[1][1], this.m[1][2],
                               this.m[2][0], this.m[2][1], this.m[2][2],
                               this.m[3][0], this.m[3][1], this.m[3][2]) / det;
 
-        r[0][1] =
+        r.m[0][1] =
             -this.m.determ3x3(this.m[0][1], this.m[0][2], this.m[0][3],
                               this.m[2][1], this.m[2][2], this.m[2][3],
                               this.m[3][1], this.m[3][2], this.m[3][3]) / det;
 
-        r[1][1] =
+        r.m[1][1] =
             +this.m.determ3x3(this.m[0][0], this.m[0][2], this.m[0][3],
                               this.m[2][0], this.m[2][2], this.m[2][3],
                               this.m[3][0], this.m[3][2], this.m[3][3]) / det;
 
-        r[2][1] =
+        r.m[2][1] =
             -this.m.determ3x3(this.m[0][0], this.m[0][1], this.m[0][3],
                               this.m[2][0], this.m[2][1], this.m[2][3],
                               this.m[3][0], this.m[3][1], this.m[3][3]) / det;
 
-        r[3][1] =
+        r.m[3][1] =
             +this.m.determ3x3(this.m[0][0], this.m[0][1], this.m[0][2],
                               this.m[2][0], this.m[2][1], this.m[2][2],
                               this.m[3][0], this.m[3][1], this.m[3][2]) / det;
 
 
-        r[0][2] =
+        r.m[0][2] =
             +this.m.determ3x3(this.m[0][1], this.m[0][2], this.m[0][3],
                               this.m[1][1], this.m[1][2], this.m[1][3],
                               this.m[3][1], this.m[3][2], this.m[3][3]) / det;
 
-        r[1][2] =
+        r.m[1][2] =
             -this.m.determ3x3(this.m[0][0], this.m[0][2], this.m[0][3],
                               this.m[1][0], this.m[1][2], this.m[1][3],
                               this.m[3][0], this.m[3][2], this.m[3][3]) / det;
 
-        r[2][2] =
+        r.m[2][2] =
             +this.m.determ3x3(this.m[0][0], this.m[0][1], this.m[0][3],
                               this.m[1][0], this.m[1][1], this.m[1][3],
                               this.m[3][0], this.m[3][1], this.m[3][3]) / det;
 
-        r[3][2] =
+        r.m[3][2] =
             -this.m.determ3x3(this.m[0][0], this.m[0][1], this.m[0][2],
                               this.m[1][0], this.m[1][1], this.m[1][2],
                               this.m[3][0], this.m[3][1], this.m[3][2]) / det;
 
 
-        r[0][3] =
+        r.m[0][3] =
             -this.m.determ3x3(this.m[0][1], this.m[0][2], this.m[0][3],
                               this.m[1][1], this.m[1][2], this.m[1][3],
                               this.m[2][1], this.m[2][2], this.m[2][3]) / det;
 
-        r[1][3] =
+        r.m[1][3] =
             +this.m.determ3x3(this.m[0][0], this.m[0][2], this.m[0][3],
                               this.m[1][0], this.m[1][2], this.m[1][3],
                               this.m[2][0], this.m[2][2], this.m[2][3]) / det;
 
-        r[2][3] =
+        r.m[2][3] =
             -this.m.determ3x3(this.m[0][0], this.m[0][1], this.m[0][3],
                               this.m[1][0], this.m[1][1], this.m[1][3],
                               this.m[2][0], this.m[2][1], this.m[2][3]) / det;
 
-        r[3][3] =
+        r.m[3][3] =
             +this.m.determ3x3(this.m[0][0], this.m[0][1], this.m[0][2],
                               this.m[1][0], this.m[1][1], this.m[1][2],
                               this.m[2][0], this.m[2][1], this.m[2][2]) / det;
@@ -198,9 +198,9 @@ class _mat4{
     } // End of 'inverse' function    
 
     rotate(angle, v) {
-        let s = Math.sin(a);
-        let c = Math.cos(a);
-        let a = angle * Math.PI / 180.0;
+        let a = angle * Math.PI / 180.0,
+            s = Math.sin(a),
+            c = Math.cos(a);
 
         return mat4(c + v.x * v.x * (1 - c), v.y * v.x * (1 - c) - v.z * s, v.z * v.x * (1 - c) + v.y * s, 0,
                     v.x * v.y * (1 - c) + v.z * s, c + v.y * v.y * (1 - c), v.z * v.y * (1 - c) - v.x * s, 0,

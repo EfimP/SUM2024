@@ -1,6 +1,6 @@
 import { mat4 } from "./mat4.js";
 
-class _vec3{
+class _vec3 {
     constructor(x, y, z) {
         if (x == undefined)
             this.x = 0, this.y = 0, this.z = 0;
