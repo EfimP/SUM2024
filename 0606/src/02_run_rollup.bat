@@ -1,0 +1,1 @@
+call npx rollup -c rollup.config.js --watch
