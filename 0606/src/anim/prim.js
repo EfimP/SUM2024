@@ -10,6 +10,13 @@ class Prim {
     }
 }
 
+function createTriangleFacets(size) {
+    return [[vec3(size, -size, -size), vec3(-size, size, -size), vec3(-size, -size, size)],
+            [vec3(size, -size, -size), vec3(-size, size, -size), vec3(size, size, size)],
+            [vec3(-size, -size, size), vec3(size, size, size), vec3(size, -size, -size)],
+            [vec3(-size, -size, size), vec3(size, size, size), vec3(-size, size, -size)]];
+}
+
 function createCubeFacets(size) {
     return [[vec3(-size, -size, -size), vec3(-size, size, -size), vec3(size, -size, -size), vec3(size, size, -size)],
             [vec3(size, -size, size), vec3(size, size, size), vec3(size, -size, -size), vec3(size, size, -size)],
@@ -19,11 +26,54 @@ function createCubeFacets(size) {
             [vec3(-size, -size, size), vec3(-size, size, size), vec3(-size, -size, -size), vec3(size, -size, -size)],];
 }
 
-function createTriangleFacets(size) {
-    return [[vec3(size, -size, -size), vec3(-size, size, -size), vec3(-size, -size, size)],
-            [vec3(size, -size, -size), vec3(-size, size, -size), vec3(size, size, size)],
-            [vec3(-size, -size, size), vec3(size, size, size), vec3(size, -size, -size)],
-            [vec3(-size, -size, size), vec3(size, size, size), vec3(-size, size, -size)]];
+function createOctaFacets(size) {
+    let p1 = vec3(2 * size, 0, 0),
+        p2 = vec3(0, 0, 2 * size),
+        p3 = vec3(-size * 2, 0, 0),
+        p4 = vec3(0, 0, -size * 2),
+        p5 = vec3(0, size * 2, 0),
+        p6 = vec3(0, -size * 2, 0);
+    return [[p1, p2, p5],
+            [p2, p3, p5],
+            [p3, p4, p5],
+            [p4, p1, p5],
+            [p1, p2, p6],
+            [p2, p3, p6],
+            [p3, p4, p6],
+            [p4, p1, p6],];
+}
+
+function createIcaFacets(size) {
+    let p = [];
+
+    for (let i = 0; i < 5; i++) {
+        p[i] = vec3(Math.cos(i * 72 * Math.PI / 180.0), 0.5, Math.sin(i * 72 * Math.PI / 180.0));    
+    }
+    for (let i = 0; i < 5; i++) {
+        p[i + 5] = vec3(Math.cos((180 + i * 72) * Math.PI / 180.0), -0.5, Math.sin((180 + i * 72) * Math.PI / 180.0));    
+    }
+    p[10] = vec3(0, Math.sqrt(5) / 2, 0);
+    p[11] = vec3(0, -Math.sqrt(5) / 2, 0);
+
+    return [[p[0], p[5], p[1]],
+            [p[5], p[1], p[6]],
+            [p[1], p[6], p[2]],
+            [p[6], p[2], p[7]],
+            [p[2], p[7], p[3]],
+            [p[7], p[3], p[8]],
+            [p[3], p[8], p[4]],
+            [p[8], p[4], p[9]],
+            [p[4], p[9], p[0]],
+            [p[9], p[0], p[5]],
+
+            [p[10], p[0], p[1]],
+            [p[10], p[1], p[2]],
+            [p[10], p[2], p[3]],
+            [p[10], p[3], p[4]],
+            [p[11], p[5], p[6]],
+            [p[11], p[6], p[7]],
+            [p[11], p[7], p[8]],
+            [p[11], p[8], p[9]],];
 }
 
 function vec3ToArray(element) {
@@ -63,12 +113,20 @@ function createVertFromFacets(facets) {
     return new Prim(vertArray, cnt, normalArray);
 }
 
+export function createTriangle(size) {
+    return createVertFromFacets(createTriangleFacets(size));
+ } 
+
 export function createCube(size) {
    return createVertFromFacets(createCubeFacets(size));
 }
 
-export function createTriangle(size) {
-    return createVertFromFacets(createTriangleFacets(size));
+export function createOctahedron(size) {
+    return createVertFromFacets(createOctaFacets(size));
+} 
+
+export function createIcohedron(size) {
+    return createVertFromFacets(createIcaFacets(size));
  } 
 
 export function bufLoad(gl, prg, prim, numOfElements) {
@@ -83,11 +141,4 @@ export function bufLoad(gl, prg, prim, numOfElements) {
       gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
       gl.enableVertexAttribArray(posLoc);
     }
-
-    // Loading to shader normal array
-    /*    
-    let normalBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(prim.normalArray), gl.STATIC_DRAW);
-    */
 }
