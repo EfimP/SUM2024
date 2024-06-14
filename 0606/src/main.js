@@ -42,7 +42,7 @@ class _render{
     else if (figure == "ica") {
       this.prim = createIcohedron(size);
     }
-    bufLoad(gl, prg, this.prim, this.prim.numOfElements);
+    bufLoad(gl, prg, this.prim);
 
     // Frame buffer
     this.frameBuffer = gl.createBuffer();
@@ -65,7 +65,6 @@ class _render{
     gl.clearColor(0.12, 0.85, 0.970, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.clear(gl.DEPTH_BUFFER_BIT);
-
     
     this.timer.response("fps");
 
@@ -84,19 +83,24 @@ class _render{
 
     // Matrix of world
     const WorldLoc = gl.getUniformLocation(this.shds.prg, "MatrWorld");
-    gl.uniformMatrix4fv(WorldLoc, false, new Float32Array(mat4().rotateY(20 + 0 * this.timer.globalTime * 140).mul(mat4().rotateX(150 + 0 * this.timer.globalTime * 70)).toArray()));
+    gl.uniformMatrix4fv(WorldLoc, false, new Float32Array(mat4().rotateY(this.timer.globalTime * 140).mul(mat4().rotateX(this.timer.globalTime * 70)).toArray()));
 
     if (figure == "triangle") {
-      gl.drawArrays(gl.TRIANGLES, 0, 12);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.prim.indexBuffer);
+      gl.drawElements(gl.TRIANGLES, 12, gl.UNSIGNED_INT, 0);
     }
     else if (figure == "cube") {
-      gl.drawArrays(gl.TRIANGLES, 0, 36);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.prim.indexBuffer);
+      gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_INT, 0);
+      //gl.drawArrays(gl.TRIANGLES, 0, 36);
     }
     else if (figure == "octa") {
-      gl.drawArrays(gl.TRIANGLES, 0, 24);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.prim.indexBuffer);
+      gl.drawElements(gl.TRIANGLES, 24, gl.UNSIGNED_INT, 0);
     }
     else if (figure == "ica") {
-      gl.drawArrays(gl.TRIANGLES, 0, 24);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.prim.indexBuffer);
+      gl.drawElements(gl.TRIANGLES, 60, gl.UNSIGNED_INT, 0);
     }
   } // End of 'render' function
 

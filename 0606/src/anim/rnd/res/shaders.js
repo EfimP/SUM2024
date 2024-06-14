@@ -1,5 +1,5 @@
 class Shader {
-    constructor(gl, ) {
+    constructor(gl) {
         // Load and compile shader function
         const loadShader = (shaderType, shaderSource) => {
             const shader = gl.createShader(shaderType);
@@ -51,7 +51,7 @@ class Shader {
     
         void main( void )
         {
-            OutColor = vec4(0.117, 0.23, 0.723, 1.0);
+            OutColor = vec4(DrawPos.xyy + DrawPos.xxy, 1.0);
         }
         `;
         this.vs = loadShader(gl.VERTEX_SHADER, vs_txt),

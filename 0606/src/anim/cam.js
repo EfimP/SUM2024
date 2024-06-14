@@ -8,7 +8,7 @@ class Camera {
         this.projDist = 0.1;
         this.projSize = 0.1;
         this.farClip = 300;
-        this.matrView = vec3().view(vec3(5), vec3(0), vec3(0, 1, 0));
+        this.matrView = vec3().view(vec3(2.5), vec3(0), vec3(0, 1, 0));
         this.projSet();
     }
 
