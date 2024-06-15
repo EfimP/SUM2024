@@ -1,29 +1,14 @@
-import {f} from "./b.js";
+let socket = new WebSocket("ws://localhost:8000");
 
-console.log("efpbmjtiofnbrkpnmw;aldbkmbn;drnt");
-f();
+socket.onopen = (event) =>{
+    console.log("Socket open");
+};
 
-setInterval(async () => {
-    const response = await fetch("/getSecretData")
-    const text = await response.text();
+socket.onmessage = (event) => {
+    $("#MsgArea").append(event.data);
+};
 
-    console.log("text")
-
-    const elem = document.getElementById("SecretDataField");
-    elem.textContent = text;
-}, 1000);
-
-function initializeCommunication() {
-    let socket = new WebSocket("ws://localhost:8000");
-
-    socket.onopen = (event) =>{
-        console.log("Socket open");
-        socket.send("Hello from client");
-    };
-
-    socket.onmessage = (event) => {
-        console.log(`Message recieved ${event.data}`);
-    };
+export function OnMouseClick (text) {
+    socket.send(text);
+    console.log("Message:", text);
 }
-
-initializeCommunication();
