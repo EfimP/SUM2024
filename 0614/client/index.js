@@ -4,8 +4,8 @@ socket.onopen = (event) =>{
     console.log("Socket open");
 };
 
-socket.onmessage = (event) => {
-    $("#MsgArea").append(event.data);
+socket.onmessage = (event) => { 
+    $("#MsgArea").append(event.data + "\n");
 };
 
 export function OnMouseClick (text) {
