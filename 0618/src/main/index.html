@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru" class="notranslate" translate="no">
+    <head>
+        <meta name="google" content="notranslate">    
+        <meta charset="utf-8" />
+        <link rel="shortcut icon" href="../../bin/images/C.BMP" type="images/BMP"/>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="./output/main.js"></script>
+    </head>
+    <body>
+        <br />FPS: <div id="fps">30</div>
+        <canvas id="glcanvas" width="1000" height="900" onmousewheel="wheel(this, event)"></canvas>
+
+        <script>
+            function wheel(a, b) {
+                let t = a.id;
+                b.preventDefault();
+            }
+        </script>
+        <script type="module">
+            $(document).ready(function () {
+
+            })
+        </script>
+    </body>
+</html>
