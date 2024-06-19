@@ -23,7 +23,7 @@ class _render{
 
     // Setting camera and matrixes
     this.cam = camCreate(this.canvas);
-    this.cam = camSet(this.cam, vec3(10), vec3(0), vec3(0, 1, 0));
+    this.cam = camSet(this.cam, vec3(0, 5, 5), vec3(0), vec3(0, 1, 0));
 
     // Loading shader
     this.shds = anim.loadShaders(gl, "default");
@@ -67,9 +67,11 @@ class _render{
     if (this.timeLoc != -1) {
       gl.uniform1f(this.timeLoc, this.timer.globalTime);
     }
-
-    this.cam = camSet(this.cam, vec3(this.counter++), vec3(0), vec3(0, 1, 0));//control(this.cam, this.timer);
     
+    this.newMatrWorld = control(this.timer);
+    if (this.newMatrWorld != null)
+      this.prim.matrWorld = this.prim.matrWorld.mul(this.newMatrWorld);
+
     this.matrixReload();
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.prim.indexBuffer);
@@ -104,12 +106,13 @@ class _render{
 
     // Matrix of world
     const WorldLoc = gl.getUniformLocation(prg, "MatrWorld");
-    gl.uniformMatrix4fv(WorldLoc, false, new Float32Array(mat4().rotateY(120 + 0 * this.timer.globalTime * 140).mul(mat4().rotateX( 120 + 0 * this.timer.globalTime * 70)).toArray()));
+    gl.uniformMatrix4fv(WorldLoc, false, new Float32Array(this.prim.matrWorld.toArray()));//mat4().rotateY(0 * this.timer.globalTime * 140).mul(mat4().rotateX(0 * this.timer.globalTime * 70)).toArray()));
   }
 }
 
 window.addEventListener("load", () => {
   anim.mouseCheck();
+  anim.keyboardCheck();
 
   const rnd = new _render("glcanvas");
   rnd.mainLoop();

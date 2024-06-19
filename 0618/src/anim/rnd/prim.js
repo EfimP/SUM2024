@@ -1,13 +1,15 @@
 import { vec3, mat4 } from "../../mth/math.js";
 
 class Prim {
-    constructor(vertexArray, vertexBuffer, indexArray, indexBuffer, numOfElements, normalArray) {
+    constructor(vertexArray, vertexBuffer, indexArray, indexBuffer, numOfElements, normalArray, matrWorld) {
         this.vertexArray = vertexArray;
         this.vertexBuffer = vertexBuffer;
         this.indexArray = indexArray;
         this.indexBuffer = indexBuffer;
         this.normalArray = normalArray;
         this.numOfElements = numOfElements;
+
+        this.matrWorld = matrWorld;
     }
 }
 
@@ -34,8 +36,26 @@ function createCubeFacets(size) {
                2, 5, 3,
                5, 3, 0];
 
-    return new Prim(p, null, ind, null, null); 
+    return new Prim(p, null, ind, null, null, null, null); 
 }
+
+function createNormals(prim)
+{
+    prim.normalArray = [];
+  for (let i = 0; i <= 12; i++)
+    prim.normalArray[i] = vec3(0);
+  for (let i = 0; i <= 12/*prim.numOfElements*/; i = i + 3)
+  {
+    let i0 = prim.indexArray[i], i1 = prim.indexArray[i + 1], i2 = prim.indexArray[i + 2];
+    let p01 = prim.vertexArray[i1].sub(prim.vertexArray[i0]), p02 = prim.vertexArray[i2].sub(prim.vertexArray[i0]);
+    let normal = p01.cross(p02).normalize();
+
+    prim.normalArray[i0] = prim.normalArray[i0].add(normal);
+    prim.normalArray[i1] = prim.normalArray[i1].add(normal);
+    prim.normalArray[i2] = prim.normalArray[i2].add(normal);
+  }
+  return prim;
+} // End of 'CreateNormals' function
 
 function vec3ToArray(element) {
     return [element.x, element.y, element.z];
@@ -52,11 +72,11 @@ function createVertFromFacets(prim) {
         vertArray = vertArray.concat(vec3ToArray(i));
         cnt++;
     }
-    return new Prim(vertArray, null, prim.indexArray, cnt, normalArray);
+    return new Prim(vertArray, null, prim.indexArray, null, cnt, normalArray, mat4());
 }
 
 export function createCube(size) {
-   return createVertFromFacets(createCubeFacets(size));
+   return createVertFromFacets(createNormals(createCubeFacets(size)));
 }
 
 export function bufLoad(gl, prg, prim) {

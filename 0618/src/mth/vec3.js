@@ -31,8 +31,8 @@ class _vec3 {
     mul(v) {
         if (typeof v == "number")
             return vec3(this.x * v, this.y * v, this.z * v);
-        else if (v.length == 4){
-            let w = this.x * v.A03 + this.y * v.A13 + this.z * v.A23 + v.A33;
+        else if (v.m != undefined){
+            let w = this.x * v.m[0][3] + this.y * v.m[1][3] + this.z * v.m[2][3] + v.m[3][3];
 
             return vec3((this.x * v.m[0][0] + this.y * v.m[1][0] + this.z * v.m[2][0] + v.m[3][0]) / w,
                         (this.x * v.m[0][1] + this.y * v.m[1][1] + this.z * v.m[2][1] + v.m[3][1]) / w,
@@ -70,7 +70,7 @@ class _vec3 {
             len = Math.sqrt(len);
             return vec3(this.x / len, this.y / len, this.z / len);
         }
-        return vec3(this);
+        return this;
     } // End of 'normalize' function
 
     transform(v) {
@@ -86,12 +86,12 @@ class _vec3 {
     } // End of'cross' function
 
     translate(v) {
-        if (v.length == 3)
+        if (typeof v == 'object')
             return mat4([[1, 0, 0, 0],
                         [0, 1, 0, 0],
                         [0, 0, 1, 0],
                         [v.x, v.y, v.z, 1]]);
-        else
+        else if (typeof v == 'number')
             return mat4([[1, 0, 0, 0],
                          [0, 1, 0, 0],
                          [0, 0, 1, 0],
@@ -134,7 +134,7 @@ class _vec3 {
     pointtrans(v) {
         return vec3(this.x * v.m[0][0] + this.y * v.m[1][0] + this.z * v.m[2][0] + v.m[3][0],
                     this.x * v.m[0][1] + this.y * v.m[1][1] + this.z * v.m[2][1] + v.m[3][1],
-                    this.x * v.m[0][2] + this.y * v.m[1][2] + this.Z * v.m[2][2] + v.m[3][2]);
+                    this.x * v.m[0][2] + this.y * v.m[1][2] + this.z * v.m[2][2] + v.m[3][2]);
     } // End of 'pointtrans' function
 } // End of 'vec3' class
 
