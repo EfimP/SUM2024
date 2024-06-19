@@ -2,6 +2,7 @@ let vs_txt =
 `#version 300 es
 precision highp float;
 in vec3 InPosition;
+in vec3 InNormal;
     
 out vec2 DrawPos;
 uniform float Time;
@@ -17,6 +18,7 @@ uniform FrameBuffer
 
 void main( void )
 {
+    vec3 N = InNormal;
     gl_Position = MatrVP * MatrWorld * vec4(InPosition, 1.0);
     DrawPos = InPosition.xy;
 }
@@ -25,6 +27,7 @@ let fs_txt =
 `#version 300 es
 precision highp float;
 out vec4 OutColor;
+in vec3 InNormal;
 
 in vec2 DrawPos;
 uniform float Time;
