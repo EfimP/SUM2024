@@ -85,19 +85,6 @@ class _vec3 {
                     this.x * v.y - this.y * v.x);
     } // End of'cross' function
 
-    translate(v) {
-        if (typeof v == 'object')
-            return mat4([[1, 0, 0, 0],
-                        [0, 1, 0, 0],
-                        [0, 0, 1, 0],
-                        [v.x, v.y, v.z, 1]]);
-        else if (typeof v == 'number')
-            return mat4([[1, 0, 0, 0],
-                         [0, 1, 0, 0],
-                         [0, 0, 1, 0],
-                         [v, v, v, 1]]);                        
-    } // End of 'translate' function    
-
     scale(v) {
         return mat4([[v.x, 0, 0, 0],
                      [0, v.y, 0, 0],
@@ -130,12 +117,6 @@ class _vec3 {
                     0, 0, (-2) / (f - n), 0,
                     (-((r + l) / (r - l))), (-((t + b) / (t - b))), (-((f + n) / (f - n))), 1);
     } // Enf of 'ortho' function
-
-    pointtrans(v) {
-        return vec3(this.x * v.m[0][0] + this.y * v.m[1][0] + this.z * v.m[2][0] + v.m[3][0],
-                    this.x * v.m[0][1] + this.y * v.m[1][1] + this.z * v.m[2][1] + v.m[3][1],
-                    this.x * v.m[0][2] + this.y * v.m[1][2] + this.z * v.m[2][2] + v.m[3][2]);
-    } // End of 'pointtrans' function
 } // End of 'vec3' class
 
 export function vec3(...args)

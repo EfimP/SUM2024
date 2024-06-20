@@ -1,3 +1,5 @@
+import { vec3 } from './vec3.js';
+
 class _mat4{
     constructor(A00, A01, A02, A03,
                 A10, A11, A12, A13,
@@ -241,6 +243,25 @@ class _mat4{
                     0, 0, 0, 1);
     } // End of 'rotateZ' function
     
+    transformPoint(v) {
+        return vec3(v.x * this.m[0][0] + v.y * this.m[1][0] + v.z * this.m[2][0] + this.m[3][0],
+                    v.x * this.m[0][1] + v.y * this.m[1][1] + v.z * this.m[2][1] + this.m[3][1],
+                    v.x * this.m[0][2] + v.y * this.m[1][2] + v.z * this.m[2][2] + this.m[3][2]);
+    } // End of 'pointtrans' function
+
+    translate(v) {
+        if (typeof v == 'object')
+            return mat4([[1, 0, 0, 0],
+                        [0, 1, 0, 0],
+                        [0, 0, 1, 0],
+                        [v.x, v.y, v.z, 1]]);
+        else if (typeof v == 'number')
+            return mat4([[1, 0, 0, 0],
+                         [0, 1, 0, 0],
+                         [0, 0, 1, 0],
+                         [v, v, v, 1]]);                        
+    } // End of 'translate' function    
+
     toArray() {
         return [].concat(...this.m);
     } // End of 'toArray' function

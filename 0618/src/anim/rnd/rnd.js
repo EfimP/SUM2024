@@ -1,2 +1,2 @@
 export * from './res/res.js';
-export { createCube, bufLoad } from "./prim.js";
+export { createCube, createQuad, bufLoad } from "./prim.js";
