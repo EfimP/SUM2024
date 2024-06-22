@@ -1,4 +1,5 @@
 export { vec3 } from './vec3.js';
+export { vec2 } from './vec2.js';
 export { mat4 } from './mat4.js';
 export { camSet, camCreate, cam } from './cam.js'
 

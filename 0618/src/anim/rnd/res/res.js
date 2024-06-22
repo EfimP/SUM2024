@@ -1,2 +1,2 @@
-export { loadShaders } from './shaders.js';
-export { texture } from './textures.js';
+export { loadShaders } from './shds.js';
+export { texture } from './tex.js';

@@ -32,7 +32,6 @@ export class input {
       rnd.canvas.addEventListener('touchend', (e) => this.onTouchEnd(e));
     }
     
-    
     window.addEventListener('keydown', (e) => this.onKeyDown(e));
     window.addEventListener('keyup', (e) => this.onKeyUp(e));
     
@@ -311,18 +310,20 @@ export class input {
     this.altKey = this.keys["AltLeft"] || this.keys["AltRight"];
     this.ctrlKey = this.keys["ControlLeft"] || this.keys["ControlRight"];
   } // End of reset' function
-          
+    
   responseCamera(timer) {
     if (this.shiftKey && this.keysClick["KeyF"]) {
       camSet(vec3(5), vec3(0), vec3(0, 1, 0));
       return;
     }
     if (this.ctrlKey) {
+      let matr = mat4();
       let angleSpeed = 70;
-      let speed = 15, dist = 0;
       let rotateY = 0, rotateX = 0;
+      let speed = 15, dist = 0;
     
       if (this.ctrlKey) {
+        cam.loc = cam.loc.add(model.forward);
         if (this.keys["ArrowRight"]) {
           rotateY = timer.globalDeltaTime * angleSpeed;
     
@@ -348,18 +349,20 @@ export class input {
           model.up = model.up.mul(mat4().rotate(rotateX, model.right.normalize()));
         }
         if (this.keys["Numpad8"]) {
-          dist = timer.globalDeltaTime * speed * (this.keys["Numpad9"] == true ? 6 : 1);
+          dist = timer.globalDeltaTime * speed * (this.keys["Numpad9"] == true ? 8 : 1);
           
           camSet(cam.loc.add(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
+          matr = matr.mul(mat4().translate(model.forward.mul(dist)));
         }
         if (this.keys["Numpad4"]) {
-          dist = timer.globalDeltaTime * speed * (this.keys["Numpad9"] == true ? 6 : 1);
+          dist = timer.globalDeltaTime * speed * (this.keys["Numpad9"] == true ? 8 : 1);
 
           camSet(cam.loc.sub(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
+          matr = matr.mul(mat4().translate(model.forward.mul(dist).neg()));
         }
-    
-        camSet(/*vec3(0, 2, -5)*/cam.loc, cam.loc.add(model.forward), model.up);
-        return mat4().rotate(rotateX, model.right.normalize()).mul(mat4().rotate(rotateY, model.up.normalize()));
+
+        camSet(cam.loc.sub(model.forward), cam.loc.add(model.forward), model.up);
+        return matr.mul(mat4().rotate(rotateX, model.right.normalize()).mul(mat4().rotate(rotateY, model.up.normalize())));
       }
       else 
         return null;

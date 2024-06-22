@@ -10,7 +10,7 @@ class camera {
         this.frameW = rect.right - rect.left + 1;
         this.projDist = 0.1;
         this.projSize = 0.1;
-        this.farClip = 3000;
+        this.farClip = 10000;
         this.matrView = vec3().view(vec3(), vec3(), vec3());
         this.loc = vec3();
         this.at = vec3();

@@ -6,26 +6,18 @@ function primsInit(rnd) {
   rnd.prims = [];
 
   // Creating first primitive
-  const size = 0.8;
-  rnd.prims[0] = anim.createCube(size, vec3(0, 0, 0));
-  // Loading shader
-  rnd.prims[0].shds = anim.loadShaders(rnd.gl, "default");
-  anim.bufLoad(rnd.gl, rnd.prims[0]);
+  rnd.prims[0] = anim.createFigure(rnd, "cube", "default", 0.8, vec3());
 
   // Creating second primitive
-  const size1 = 0.7;
-  rnd.prims[1] = anim.createCube(size1, vec3(0, 0, -5));
+  const size = 1000;
   // Loading shader
-  rnd.prims[1].shds = anim.loadShaders(rnd.gl, "cube");
-  anim.bufLoad(rnd.gl, rnd.prims[1]);
-
-  // Creating second primitive
-  const size2 = 500;
-  rnd.prims[2] = anim.createQuad(size2, vec3(0, 0, 0));
-  // Loading shader
-  rnd.prims[2].shds = anim.loadShaders(rnd.gl, "default");
-  anim.bufLoad(rnd.gl, rnd.prims[2]);
-  anim.texture(rnd.gl, "../../bin/textures/land");
+  let img = new Image();
+  img.src = "./moss.jpg";
+  anim.texture(rnd.gl, {img: img, name: "land"});
+  
+  for (let i = -2, cnt = 0; i <= 2; i++)
+    for (let j = -2; j <= 2; j++)
+      rnd.prims[cnt++ + 1] = anim.createFigure(rnd, "quad", "quad", 1000, vec3(i * size, 0, j * size));
 
   return rnd.prims;
 }
@@ -128,7 +120,7 @@ class _render{
       if (this.prims[i].indexArray == null)
         gl.drawArrays(gl.TRIANGLES, 0, this.prims[i].numOfElements);
       else
-        gl.drawElements(gl.TRIANGLES, /*this.prims[i].numOfElements * */(i == 2 ? 6 : 36), gl.UNSIGNED_INT, 0);
+        gl.drawElements(gl.TRIANGLES, /*this.prims[i].numOfElements * */(this.prims[i].name == "quad" ? 6 : 36), gl.UNSIGNED_INT, 0);
     }
   } // End of 'render' function
 

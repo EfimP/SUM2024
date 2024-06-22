@@ -22,10 +22,22 @@ class _vec3 {
         return vec3(this.x + v.x, this.y + v.y, this.z + v.z);
     } // End of 'add' function
 
+    setAdd(v1, v2) {
+        if (typeof v2 == "number")
+            return vec3(v1.x + v2, v1.y + v2, v1.z + v2);
+        return vec3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+    } // End of 'add' function
+
     sub(v) {
         if (typeof v == "number")
             return vec3(this.x - v, this.y - v, this.z - v);
         return vec3(this.x - v.x, this.y - v.y, this.z - v.z);
+    } // End of 'sub' function
+
+    setSub(v1, v2) {
+        if (typeof v2 == "number")
+            return vec3(v1.x - v2, v1.y - v2, v1.z - v2);
+        return vec3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
     } // End of 'sub' function
 
     mul(v) {
@@ -85,14 +97,6 @@ class _vec3 {
                     this.x * v.y - this.y * v.x);
     } // End of'cross' function
 
-    scale(v) {
-        return mat4([[v.x, 0, 0, 0],
-                     [0, v.y, 0, 0],
-                     [0, 0, v.z, 0],
-                     [0, 0, 0, 1]]);                        
-
-    } // End of 'scale' function
-
     view(loc, at, up) {
         let dir = at.sub(loc).normalize();
         let right = dir.cross(up).normalize();
@@ -119,7 +123,6 @@ class _vec3 {
     } // Enf of 'ortho' function
 } // End of 'vec3' class
 
-export function vec3(...args)
-{
+export function vec3(...args) {
     return new _vec3(...args);
 } // End of 'vec3' function
