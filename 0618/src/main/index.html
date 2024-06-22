@@ -1,16 +1,34 @@
 <!DOCTYPE html>
 <html lang="ru" class="notranslate" translate="no">
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="google" content="notranslate">    
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="../../bin/images/C.BMP" type="images/BMP"/>
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script src="./output/main.js"></script>
+        <style>
+            body{
+                width: 100vw;
+                height: 100vh;
+            }
+            #glcanvas{
+                width: 100%;
+                height: 100%;
+            }
+            #__fps {
+                position: absolute;
+                top: 19px;
+                left: 10px;
+                z-index: 999999999999999999;
+            }
+        </style>
     </head>
     <body>
-        <br />FPS: <div id="fps">30</div>
-        <canvas id="glcanvas" width="1000" height="900" onmousewheel="wheel(this, event)"></canvas>
-
+        <div>
+            <div id="__fps">FPS: <div id="fps">30</div></div>
+            <canvas id="glcanvas" onmousewheel="wheel(this, event)"></canvas>
+         </div>
         <script>
             function wheel(a, b) {
                 let t = a.id;

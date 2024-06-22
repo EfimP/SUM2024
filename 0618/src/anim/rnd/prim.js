@@ -60,8 +60,8 @@ function createCubeFacets(size, pos) {
 function createQuadFacets(size, pos) {
   let p = [];
   p[0] = vert(pos.add(vec3(-size / 2, 0, -size / 2)), vec3(), vec2(0, 0)),
-  p[1] = vert(pos.add(vec3(-size / 2, 0, size / 2)), vec3(), vec2(1, 0)),
-  p[2] = vert(pos.add(vec3(size / 2, 0, -size / 2)), vec3(), vec2(0, 1)),
+  p[1] = vert(pos.add(vec3(-size / 2, 0, size / 2)), vec3(), vec2(0, 1)),
+  p[2] = vert(pos.add(vec3(size / 2, 0, -size / 2)), vec3(), vec2(1, 0)),
   p[3] = vert(pos.add(vec3(size / 2, 0, size / 2)), vec3(), vec2(1, 1));
   let ind = [2, 0, 1,
              2, 1, 3];

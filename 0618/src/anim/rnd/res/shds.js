@@ -91,9 +91,13 @@ uniform FrameBuffer
 
 void main( void )
 {
+    vec2[6] tc = vec2[6](vec2(1, 0), vec2(0, 0), vec2(0, 1), vec2(1, 0), vec2(0, 1), vec2(1, 1));
+
+
     gl_Position = MatrVP * MatrWorld * vec4(InPosition, 1.0);
     DrawPos = vec3(MatrWorld * vec4(InPosition, 1));
-    DrawTex = DrawTexCoord;
+    //DrawTex = DrawTexCoord;
+    DrawTex = tc[gl_VertexID];
     DrawNormal = InNormal;
 }
 `;
@@ -106,6 +110,7 @@ in vec3 DrawPos;
 in vec2 DrawTex;
 in vec3 DrawNormal;
 uniform float Time;
+uniform vec2 TransVec;
 uniform vec3 CamLoc;
 
 uniform sampler2D Tex;
@@ -125,9 +130,9 @@ vec2 rot( float a, vec2 v )
 mat4 MatrScale( vec3 v )
 {
   return mat4(v.x, 0, 0, 0,
-                 0, v.y, 0, 0,
-                 0, 0, v.z, 0,
-                 0, 0, 0, 1);
+              0, v.y, 0, 0,
+              0, 0, v.z, 0,
+              0, 0, 0, 1);
 }
 
 void main( void )
@@ -146,19 +151,14 @@ void main( void )
     vec3 R = reflect(V, N);
     color += vec3(0.1, 0.2, 0.3) * max(0.0, pow(dot(R, L), 1.0));
 
-    if (pow(abs(sin(Time + DrawPos.x * 0.7)), 2000.0) > 0.3 || 
-        pow(abs(sin(Time + DrawPos.z * 0.7)), 2000.0) > 0.3)
-        color = vec3(0, 1, 0);
-    //color += vec3(0, 1, 0) * pow(abs(sin(Time + DrawPos.x * 0.7)), 2000.0);
-
     OutColor = vec4(color, 1);
 
-    //vec3 N = DrawNormal;
-    //OutColor = vec4(DrawPos.xyy + DrawPos.xxy, 1.0);
-    //OutColor = vec4(N, 1.0);
-
-    vec4 tc = texture(Tex, vec2(vec4(DrawTex, 0.0, 0.0) * MatrScale(vec3(10))));//rot(100.0, (1.0 - DrawTex) * (5.0 + 3.0 * sin(Time))));
+    //vec4 tc = texture(Tex, DrawTex /* MatrScale(vec3(10.0))*/ + TransVec);
+    vec4 tc = texture(Tex, DrawTex /* MatrScale(vec3(10.0))*/);
+    //rot(100.0, (1.0 - DrawTex) * (5.0 + 3.0 * sin(Time))));
     OutColor = vec4(tc.rgb, 1);
+
+    OutColor = vec4(DrawTex, 0, 1);
 }
 `;
 

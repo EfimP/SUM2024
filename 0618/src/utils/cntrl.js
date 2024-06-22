@@ -1,4 +1,5 @@
 import {cam, camSet, mat4, vec3} from "../mth/math.js";
+export let matrTrans = mat4(), vecTrans = vec3();
  
 const D2R = degrees => degrees * Math.PI / 180;
 const R2D = radians => radians * 180 / Math.PI;
@@ -15,6 +16,8 @@ class _dir {
     this.pos = pos;
   }
 }
+
+let allTranslate = mat4();
 
 let model = new _dir(vec3(0, 1, 0), vec3(-1, 0, 0), vec3(0, 0, 1), vec3(0));
 
@@ -321,9 +324,27 @@ export class input {
       let angleSpeed = 70;
       let rotateY = 0, rotateX = 0;
       let speed = 15, dist = 0;
+      let prevPos= model.pos;
     
       if (this.ctrlKey) {
         cam.loc = cam.loc.add(model.forward);
+        if (this.keys["Numpad8"]) {
+          dist = timer.globalDeltaTime * speed * (this.keys["Numpad9"] == true ? 8 : 1);
+
+          camSet(cam.loc.add(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
+          matr = matr.mul(mat4().translate(model.forward.mul(dist)));
+          model.pos = model.pos.mul(mat4().translate(model.forward.mul(dist)));
+          allTranslate = allTranslate.mul(mat4().translate(model.forward.mul(dist)));
+        }
+        if (this.keys["Numpad4"]) {
+          dist = timer.globalDeltaTime * speed * (this.keys["Numpad9"] == true ? 8 : 1);
+
+          camSet(cam.loc.sub(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
+          matr = matr.mul(mat4().translate(model.forward.mul(dist).neg()));
+          model.pos = model.pos.mul(mat4().translate(model.forward.mul(dist).neg()));
+          allTranslate = allTranslate.mul(mat4().translate(model.forward.mul(dist).neg()));
+        }
+        let newPos = model.pos;
         if (this.keys["ArrowRight"]) {
           rotateY = timer.globalDeltaTime * angleSpeed;
     
@@ -337,35 +358,26 @@ export class input {
           model.right = model.right.mul(mat4().rotate(rotateY, model.up.normalize()));
         }
         if (this.keys["ArrowUp"]) {
-          rotateX = -timer.globalDeltaTime * angleSpeed;
-    
-          model.forward = model.forward.mul(mat4().rotate(rotateX, model.right.normalize()));
-          model.up = model.up.mul(mat4().rotate(rotateX, model.right.normalize()));
-        }
-        if (this.keys["ArrowDown"]) {
           rotateX = timer.globalDeltaTime * angleSpeed;
     
           model.forward = model.forward.mul(mat4().rotate(rotateX, model.right.normalize()));
           model.up = model.up.mul(mat4().rotate(rotateX, model.right.normalize()));
         }
-        if (this.keys["Numpad8"]) {
-          dist = timer.globalDeltaTime * speed * (this.keys["Numpad9"] == true ? 8 : 1);
-          
-          camSet(cam.loc.add(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
-          matr = matr.mul(mat4().translate(model.forward.mul(dist)));
-        }
-        if (this.keys["Numpad4"]) {
-          dist = timer.globalDeltaTime * speed * (this.keys["Numpad9"] == true ? 8 : 1);
-
-          camSet(cam.loc.sub(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
-          matr = matr.mul(mat4().translate(model.forward.mul(dist).neg()));
+        if (this.keys["ArrowDown"]) {
+          rotateX = -timer.globalDeltaTime * angleSpeed;
+    
+          model.forward = model.forward.mul(mat4().rotate(rotateX, model.right.normalize()));
+          model.up = model.up.mul(mat4().rotate(rotateX, model.right.normalize()));
         }
 
-        camSet(cam.loc.sub(model.forward), cam.loc.add(model.forward), model.up);
-        return matr.mul(mat4().rotate(rotateX, model.right.normalize()).mul(mat4().rotate(rotateY, model.up.normalize())));
+        vecTrans = vecTrans.sub(vec3(prevPos.x, 0, prevPos.z).sub(vec3(newPos.x, 0, newPos.z)).mul(0.001));
+        matrTrans = matrTrans.mul(mat4().translate(vec3(newPos.x, 0, newPos.z).sub(vec3(prevPos.x, 0, prevPos.z))));
+
+        camSet(model.pos.sub(model.forward.mul(5)).add(model.up.mul(3.5)), model.pos.add(model.forward.mul(2)), model.up);
+        return matr.mul(allTranslate.inverse()).mul(mat4().rotate(rotateX, model.right.normalize()).mul(mat4().rotate(rotateY, model.up.normalize()))).mul(allTranslate);
       }
       else 
         return null;
     }
-  } // End of 'responseсCamera' function
+  } // End of 'responseCamera' function
 } // End of 'input' class

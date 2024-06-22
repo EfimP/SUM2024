@@ -1,6 +1,27 @@
 import { vec3, mat4, camCreate, camSet, cam } from "../mth/math.js";
 import * as anim from '../anim/anim.js';
-import { input } from "../utils/cntrl.js";
+import { input, matrTrans, vecTrans } from "../utils/cntrl.js";
+
+function resizeCanvasToDisplaySize(rnd) {
+  let canvas = rnd.canvas;
+  // Lookup the size the browser is displaying the canvas in CSS pixels.
+  const displayWidth  = canvas.clientWidth;
+  const displayHeight = canvas.clientHeight;
+ 
+  // Check if the canvas is not the same size.
+  const needResize = canvas.width  !== displayWidth ||
+                     canvas.height !== displayHeight;
+ 
+  if (needResize) {
+    // Make the canvas the same size
+    canvas.width  = displayWidth;
+    canvas.height = displayHeight;
+  }
+ 
+  rnd.gl.viewport(0, 0, rnd.gl.canvas.width, rnd.gl.canvas.height);
+
+  return needResize;
+}
 
 function primsInit(rnd) {
   rnd.prims = [];
@@ -12,7 +33,7 @@ function primsInit(rnd) {
   const size = 1000;
   // Loading shader
   let img = new Image();
-  img.src = "./moss.jpg";
+  img.src = "./land.jpg";
   anim.texture(rnd.gl, {img: img, name: "land"});
   
   for (let i = -2, cnt = 0; i <= 2; i++)
@@ -61,13 +82,6 @@ class _render{
         gl.getUniformBlockIndex(prg, "FrameBuffer"),
         this.frameUniformBufferIndex);
 
-      // getting binding point for variable of time
-      this.timeLoc = [];
-      this.timeLoc[i] = gl.getUniformLocation(prg, "Time");
-
-      this.cameraLocatioinLoc = [];
-      this.cameraLocatioinLoc[i] = gl.getUniformLocation(prg, "CamLoc");
-
       this.matrixReload(this.prims[i]);
     };
 
@@ -84,6 +98,8 @@ class _render{
     
     // Drawing fps
     this.timer.response("fps");
+
+    resizeCanvasToDisplaySize(this);
 
     // Sending frame buffer to shaders
     gl.bindBuffer(gl.UNIFORM_BUFFER, this.frameBuffer);
@@ -103,14 +119,25 @@ class _render{
     for (let i = 0; this.prims[i] != undefined; i++) {
       let prg = this.prims[i].shds.prg;
 
+      if (this.prims[i].name == "quad")
+        this.prims[i].matrWorld = matrTrans;
+
       gl.useProgram(prg);
 
       // Updating time on shaders
-      if (this.timeLoc[i] != -1)
-        gl.uniform1f(this.timeLoc[i], this.timer.globalTime);
+      this.timeLoc = gl.getUniformLocation(prg, "Time");
+      if (this.timeLoc != null)
+        gl.uniform1f(this.timeLoc, this.timer.globalTime);
 
-      if (this.cameraLocatioinLoc[i] != -1)
-        gl.uniform3f(this.cameraLocatioinLoc[i], this.cam.loc.x, this.cam.loc.y, this.cam.loc.z);
+      // Updating translating of texture on shaders
+      this.transLoc = gl.getUniformLocation(prg, "TransVec");
+      if (this.transLoc != null)
+        gl.uniform2f(this.transLoc, vecTrans.x, vecTrans.z);
+
+      // Updating camera location on shaders
+      this.cameraLocatioinLoc = gl.getUniformLocation(prg, "CamLoc");
+      if (this.cameraLocatioinLoc != null)
+        gl.uniform3f(this.cameraLocatioinLoc, this.cam.loc.x, this.cam.loc.y, this.cam.loc.z);
 
       // Reloading matrixes
       this.matrixReload(this.prims[i]);
