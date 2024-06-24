@@ -324,7 +324,7 @@ export class input {
       let angleSpeed = 70;
       let rotateY = 0, rotateX = 0;
       let speed = 15, dist = 0;
-      let prevPos= model.pos;
+      let prevPos = model.pos;
     
       if (this.ctrlKey) {
         cam.loc = cam.loc.add(model.forward);

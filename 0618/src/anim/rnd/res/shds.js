@@ -96,8 +96,8 @@ void main( void )
 
     gl_Position = MatrVP * MatrWorld * vec4(InPosition, 1.0);
     DrawPos = vec3(MatrWorld * vec4(InPosition, 1));
-    //DrawTex = DrawTexCoord;
-    DrawTex = tc[gl_VertexID];
+    DrawTex = DrawTexCoord;
+    //DrawTex = tc[gl_VertexID];
     DrawNormal = InNormal;
 }
 `;
@@ -153,12 +153,12 @@ void main( void )
 
     OutColor = vec4(color, 1);
 
-    //vec4 tc = texture(Tex, DrawTex /* MatrScale(vec3(10.0))*/ + TransVec);
-    vec4 tc = texture(Tex, DrawTex /* MatrScale(vec3(10.0))*/);
+    vec4 tc = texture(Tex, vec2(vec4(DrawTex, 0, 0) * MatrScale(vec3(10.0))) + TransVec);
+    //vec4 tc = texture(Tex, DrawTex * MatrScale(vec3(10.0)));
     //rot(100.0, (1.0 - DrawTex) * (5.0 + 3.0 * sin(Time))));
     OutColor = vec4(tc.rgb, 1);
 
-    OutColor = vec4(DrawTex, 0, 1);
+    //OutColor = vec4(DrawTex, 0, 1);
 }
 `;
 

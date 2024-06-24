@@ -33,12 +33,17 @@ function primsInit(rnd) {
   const size = 1000;
   // Loading shader
   let img = new Image();
-  img.src = "./land.jpg";
+  img.src = "./moss.jpg";
   anim.texture(rnd.gl, {img: img, name: "land"});
+  rnd.prims[1] = anim.createFigure(rnd, "quad", "quad", 5000, vec3(0));
   
-  for (let i = -2, cnt = 0; i <= 2; i++)
-    for (let j = -2; j <= 2; j++)
-      rnd.prims[cnt++ + 1] = anim.createFigure(rnd, "quad", "quad", 1000, vec3(i * size, 0, j * size));
+  fetch("./cow.obj").then(response => response.text()).then((response) => {
+    const text = response;
+
+    rnd.prims[2] = anim.loadPrim(text);
+    rnd.prims[2].shds = anim.loadShaders(rnd.gl, "default");
+    anim.bufLoad(rnd.gl, rnd.prims[2]);
+  });
 
   return rnd.prims;
 }

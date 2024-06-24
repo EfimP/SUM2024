@@ -138,14 +138,16 @@ export function bufLoad(gl, prim) {
       gl.enableVertexAttribArray(normLoc);
     }
     if (texLoc != -1) {
-      gl.vertexAttribPointer(texLoc, 3, gl.FLOAT, false, 4 * 3 * 2 + 4 * 2, 4 * 3 * 2);
+      gl.vertexAttribPointer(texLoc, 2, gl.FLOAT, false, 4 * 3 * 2 + 4 * 2, 4 * 3 * 2);
       gl.enableVertexAttribArray(texLoc);
     }
 
     // Loading to shader index array
-    prim.indexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, prim.indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(prim.indexArray), gl.STATIC_DRAW);
+    if (prim.indexArray != null) {
+      prim.indexBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, prim.indexBuffer);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(prim.indexArray), gl.STATIC_DRAW);
+    }
 }
 
 export function createFigure(rnd, figureName, shdName, size, pos) {
@@ -160,4 +162,53 @@ export function createFigure(rnd, figureName, shdName, size, pos) {
   bufLoad(rnd.gl, prim);
 
   return prim;
+}
+
+function autoNormals(prim)
+{
+  for (let i = 0; i < prim.numOfElements; i++)
+    prim.vertexArray[i].norm = vec3(0);
+  for (let i = 0; i < prim.numOfElements; i++)
+  {
+    let p01 = prim.vertexArray[i + 1].pos.sub(prim.vertexArray[i + 0].pos), 
+        p02 = prim.vertexArray[i + 2].pos.sub(prim.vertexArray[i + 0].pos);
+    let normal = p01.cross(p02).normalize();
+
+    prim.vertexArray[i0].norm = prim.vertexArray[i0].norm.add(normal);
+    prim.vertexArray[i1].norm = prim.vertexArray[i1].norm.add(normal);
+    prim.vertexArray[i2].norm = prim.vertexArray[i2].norm.add(normal);
+  }
+  return prim;
+} // End of 'CreateNormals' function
+
+export function loadPrim(text) {
+  const lines = text.split("\n");
+  let posArray = [];
+  let texArray = [];
+  let vertArray = [];
+  let posCnt = 0;
+  let texCnt = 0;
+  let vertCnt = 0;
+
+  for (let i = 0; lines[i] != undefined; i++) {
+    if (lines[i].slice(0, 2) == "v ") {
+      let tmp = lines[i].slice(1, -2).trim().split(" ");
+      if (Number(tmp[0]) != NaN)
+        posArray[posCnt] = vec3(Number(tmp[0]), Number(tmp[1]), Number(tmp[2])), posCnt++;
+    }
+    else if (lines[i].slice(0, 2) == "vt") {
+      let tmp = lines[i].slice(2, -2).trim().split(" ");
+      if (Number(tmp[0]) != NaN)
+        texArray[texCnt] = vec2(Number(tmp[0]), Number(tmp[1])), texCnt++;
+    }
+    else if (lines[i].slice(0, 2) == "f ") {
+      let tmp = lines[i].slice(1).trim().split(" ");
+      for (let j = 0; tmp[j] != undefined; j++) {
+        let tmp2 = tmp[j].trim().split("/");
+        if (Number(tmp2[0]) != NaN)
+          vertArray[vertCnt] = vert(posArray[Number(tmp2[0])], vec3(), texArray.length == 0 ? vec2() : texArray[Number(tmp2[2] == undefined ? tmp2[1] : tmp2[2])]), vertCnt++;
+      }
+    }
+  }
+  return createPrim(vertArray, null, vertCnt, mat4(), "primFromFile");
 }
