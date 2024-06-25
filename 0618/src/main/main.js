@@ -30,22 +30,34 @@ function primsInit(rnd) {
   rnd.prims[0] = anim.createFigure(rnd, "cube", "default", 0.8, vec3());
 
   // Creating second primitive
-  const size = 1000;
+  const size = 5000;
   // Loading shader
   let img = new Image();
   img.src = "./moss.jpg";
   anim.texture(rnd.gl, {img: img, name: "land"});
-  rnd.prims[1] = anim.createFigure(rnd, "quad", "quad", 5000, vec3(0));
+  rnd.prims[1] = anim.createFigure(rnd, "quad", "quad", size, vec3(0));
   
-  fetch("./cow.obj").then(response => response.text()).then((response) => {
-    const text = response;
-
-    rnd.prims[2] = anim.loadPrim(text);
-    rnd.prims[2].shds = anim.loadShaders(rnd.gl, "default");
-    anim.bufLoad(rnd.gl, rnd.prims[2]);
-  });
+  rnd.flag = false;
+  rnd.prims[2] = anim.loadPrim(rnd, "./cow.obj");
 
   return rnd.prims;
+}
+
+function frameBlockBind(rnd) {
+  let gl = rnd.gl;
+  // Loading matrixes and frame buffer
+  for (let i = 0; rnd.prims[i] != undefined; i++)
+    if (i != 2 || rnd.flag) {
+      let prg = rnd.prims[i].shds.prg;
+
+      gl.useProgram(prg);
+      gl.uniformBlockBinding(prg, 
+        gl.getUniformBlockIndex(prg, "FrameBuffer"),
+        rnd.frameUniformBufferIndex);
+
+      rnd.matrixReload(rnd.prims[i]);
+    }
+
 }
 
 class _render{
@@ -78,17 +90,8 @@ class _render{
     gl.bindBuffer(gl.UNIFORM_BUFFER, this.frameBuffer);
     gl.bufferData(gl.UNIFORM_BUFFER, 4 * 4, gl.STATIC_DRAW);
 
-    // Loading matrixes and frame buffer
-    for (let i = 0; this.prims[i] != undefined; i++) {
-      let prg = this.prims[i].shds.prg;
-
-      gl.useProgram(prg);
-      gl.uniformBlockBinding(prg, 
-        gl.getUniformBlockIndex(prg, "FrameBuffer"),
-        this.frameUniformBufferIndex);
-
-      this.matrixReload(this.prims[i]);
-    };
+    frameBlockBind(this);
+    this.first = true;
 
     // Initializing input system
     this.input = new input(this);
@@ -121,39 +124,43 @@ class _render{
       }
     }
 
-    for (let i = 0; this.prims[i] != undefined; i++) {
-      let prg = this.prims[i].shds.prg;
+    if (this.flag && this.first)
+      frameBlockBind(this), this.first = false;
 
-      if (this.prims[i].name == "quad")
-        this.prims[i].matrWorld = matrTrans;
+    for (let i = 0; this.prims[i] != undefined; i++)
+      if (i != 2 || this.flag) {
+        let prg = this.prims[i].shds.prg;
 
-      gl.useProgram(prg);
+        if (this.prims[i].name == "quad")
+          this.prims[i].matrWorld = matrTrans;
 
-      // Updating time on shaders
-      this.timeLoc = gl.getUniformLocation(prg, "Time");
-      if (this.timeLoc != null)
-        gl.uniform1f(this.timeLoc, this.timer.globalTime);
+        gl.useProgram(prg);
 
-      // Updating translating of texture on shaders
-      this.transLoc = gl.getUniformLocation(prg, "TransVec");
-      if (this.transLoc != null)
-        gl.uniform2f(this.transLoc, vecTrans.x, vecTrans.z);
+        // Updating time on shaders
+        this.timeLoc = gl.getUniformLocation(prg, "Time");
+        if (this.timeLoc != null)
+          gl.uniform1f(this.timeLoc, this.timer.globalTime);
 
-      // Updating camera location on shaders
-      this.cameraLocatioinLoc = gl.getUniformLocation(prg, "CamLoc");
-      if (this.cameraLocatioinLoc != null)
-        gl.uniform3f(this.cameraLocatioinLoc, this.cam.loc.x, this.cam.loc.y, this.cam.loc.z);
+        // Updating translating of texture on shaders
+        this.transLoc = gl.getUniformLocation(prg, "TransVec");
+        if (this.transLoc != null)
+          gl.uniform2f(this.transLoc, vecTrans.x, vecTrans.z);
 
-      // Reloading matrixes
-      this.matrixReload(this.prims[i]);
+        // Updating camera location on shaders
+        this.cameraLocatioinLoc = gl.getUniformLocation(prg, "CamLoc");
+        if (this.cameraLocatioinLoc != null)
+          gl.uniform3f(this.cameraLocatioinLoc, this.cam.loc.x, this.cam.loc.y, this.cam.loc.z);
 
-      // Drawing of primitives
-      gl.bindVertexArray(this.prims[i].vertexAttribArray);
-      if (this.prims[i].indexArray == null)
-        gl.drawArrays(gl.TRIANGLES, 0, this.prims[i].numOfElements);
-      else
-        gl.drawElements(gl.TRIANGLES, /*this.prims[i].numOfElements * */(this.prims[i].name == "quad" ? 6 : 36), gl.UNSIGNED_INT, 0);
-    }
+        // Reloading matrixes
+        this.matrixReload(this.prims[i]);
+
+        // Drawing of primitives
+        gl.bindVertexArray(this.prims[i].vertexAttribArray);
+        if (this.prims[i].indexArray == null)
+          gl.drawArrays(gl.TRIANGLES, 0, this.prims[i].numOfElements);
+        else
+          gl.drawElements(gl.TRIANGLES, this.prims[i].numOfElements, gl.UNSIGNED_INT, 0);
+      }
   } // End of 'render' function
 
   mainLoop() {
@@ -184,7 +191,7 @@ class _render{
 
     // Matrix of world
     const WorldLoc = gl.getUniformLocation(prg, "MatrWorld");
-    gl.uniformMatrix4fv(WorldLoc, false, new Float32Array(prim.matrWorld.toArray()));//mat4().rotateY(0 * this.timer.globalTime * 140).mul(mat4().rotateX(0 * this.timer.globalTime * 70)).toArray()));
+    gl.uniformMatrix4fv(WorldLoc, false, new Float32Array(prim.matrWorld.toArray()));
   }
 }
 

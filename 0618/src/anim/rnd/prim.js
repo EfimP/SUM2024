@@ -16,9 +16,11 @@ function vert(position, normal, texCoord) {
 class Prim {
     constructor(vertexArray, indexArray, numOfElements, matrWorld, name) {
         this.vertexArray = vertexArray;
+        this.numOfV;
         this.vertexAttribArray = null;
         this.vertexBuffer = null;
         this.indexArray = indexArray;
+        this.numOfI;
         this.indexBuffer = null;
         this.numOfElements = numOfElements;
         this.matrWorld = matrWorld;
@@ -103,19 +105,22 @@ function createVertFromFacets(prim) {
     let cnt = 0;
 
     for (let i of facets)
-    {
         vertArray = vertArray.concat(vec3ToArray(i.pos).concat(vec3ToArray(i.norm)).concat(vec2ToArray(i.texCoord)));
-        cnt++;
-    }
-    return createPrim(vertArray, prim.indexArray, cnt, mat4(), prim.name);
+    prim.vertexArray = vertArray;
+    prim.matrWorld = mat4();
+    return prim;
 }
 
 export function createCube(size, pos) {
-   return createVertFromFacets(createNormals(createCubeFacets(size, pos)));
+   let prim = createVertFromFacets(createNormals(createCubeFacets(size, pos)));
+   prim.numOfElements = 36;
+   return prim;
 }
 
 export function createQuad(size, pos) {
-  return createVertFromFacets(createNormals(createQuadFacets(size, pos)));
+  let prim = createVertFromFacets(createNormals(createQuadFacets(size, pos)));
+  prim.numOfElements = 6;
+  return prim;
 }
 
 export function bufLoad(gl, prim) {
@@ -164,24 +169,79 @@ export function createFigure(rnd, figureName, shdName, size, pos) {
   return prim;
 }
 
-function autoNormals(prim)
-{
-  for (let i = 0; i < prim.numOfElements; i++)
-    prim.vertexArray[i].norm = vec3(0);
-  for (let i = 0; i < prim.numOfElements; i++)
-  {
-    let p01 = prim.vertexArray[i + 1].pos.sub(prim.vertexArray[i + 0].pos), 
-        p02 = prim.vertexArray[i + 2].pos.sub(prim.vertexArray[i + 0].pos);
-    let normal = p01.cross(p02).normalize();
 
-    prim.vertexArray[i0].norm = prim.vertexArray[i0].norm.add(normal);
-    prim.vertexArray[i1].norm = prim.vertexArray[i1].norm.add(normal);
-    prim.vertexArray[i2].norm = prim.vertexArray[i2].norm.add(normal);
+function autoNormals(V, NoofV, Ind, NoofI)
+{
+  /* Set all vertex normals to zero */
+  for (let i = 0; i < NoofV; i++)
+    V[i].norm = vec3();
+ 
+  /* Eval normal for every facet */
+  for (let i = 0; i < NoofI - 2; i += 3)
+  {
+    let n0 = Ind[i], n1 = Ind[i + 1], n2 = Ind[i + 2];
+    let
+      p0 = V[n0].pos,
+      p1 = V[n1].pos,
+      p2 = V[n2].pos,
+      N = p1.sub(p0).cross(p2.sub(p0)).normalize();
+ 
+    V[n0].norm = V[n0].norm.add(N);
+    V[n1].norm = V[n1].norm.add(N);
+    V[n2].norm = V[n2].norm.add(N);
   }
+ 
+  /* Normalize all vertex normals */
+  for (let i = 0; i < NoofV; i++)
+    V[i].norm = V[i].norm.normalize();
+
+  let prim = createPrim(V, Ind, NoofI, mat4(), "loaded");
+  prim.numOfV = NoofV;
   return prim;
 } // End of 'CreateNormals' function
 
-export function loadPrim(text) {
+export async function loadPrim(rnd, name) {
+  const response = await fetch("./cow.obj");
+  const text = await response.text();
+  const lines = text.split("\n");
+  let posArray = [];
+  let indArray = [];
+  let posCnt = 0;
+  let indCnt = 0;
+
+  for (let i = 0; lines[i] != undefined; i++) {
+    if (lines[i].slice(0, 2) == "v ") {
+      let tmp = lines[i].slice(1, -2).trim().split(" ");
+      if (Number(tmp[0]) != NaN) {
+        let pos = vec3(Number(tmp[0]), Number(tmp[1]), Number(tmp[2]));
+        posArray[posCnt] = vert((pos == undefined ? vec3() : pos), vec3(), vec2()), posCnt++;
+      }
+      else
+        posArray[posCnt] = vert(vec3(), vec3(), vec2()), posCnt++;
+    }
+    else if (lines[i].slice(0, 2) == "f ") {
+      let tmp = lines[i].slice(1).trim().split(" ");
+      for (let j = 0; tmp[j] != undefined; j++) {
+        let tmp2 = tmp[j].trim().split("/");
+        if (Number(tmp2[0]) != NaN) {
+          let ind = (Number(tmp2[0]) >= posCnt ? posCnt - 1 : Number(tmp2[0]) - 1);
+          indArray[indCnt] = ind, indCnt++;
+        }
+      }
+    }
+  }
+  let prim = createVertFromFacets(autoNormals(posArray, posCnt, indArray, indCnt));
+  prim.shds = loadShaders(rnd.gl, "default");
+  bufLoad(rnd.gl, prim);
+  rnd.flag = true;
+  rnd.prims[2] = prim;
+}
+
+
+/*
+export async function loadPrim(rnd, name) {
+  const response = await fetch("./cow.obj")
+  const text = await response.text();
   const lines = text.split("\n");
   let posArray = [];
   let texArray = [];
@@ -193,22 +253,38 @@ export function loadPrim(text) {
   for (let i = 0; lines[i] != undefined; i++) {
     if (lines[i].slice(0, 2) == "v ") {
       let tmp = lines[i].slice(1, -2).trim().split(" ");
-      if (Number(tmp[0]) != NaN)
-        posArray[posCnt] = vec3(Number(tmp[0]), Number(tmp[1]), Number(tmp[2])), posCnt++;
+      if (Number(tmp[0]) != NaN) {
+        let pos = vec3(Number(tmp[0]), Number(tmp[1]), Number(tmp[2]));
+        posArray[posCnt] = (pos == undefined ? vec3() : pos), posCnt++;
+      }
+      else
+        posArray[posCnt] = vec3(), posCnt++;
     }
     else if (lines[i].slice(0, 2) == "vt") {
       let tmp = lines[i].slice(2, -2).trim().split(" ");
-      if (Number(tmp[0]) != NaN)
-        texArray[texCnt] = vec2(Number(tmp[0]), Number(tmp[1])), texCnt++;
+      if (Number(tmp[0]) != NaN) {
+        let tex = vec2(Number(tmp[0]), Number(tmp[1]));
+        texArray[texCnt] = (tex == undefined ? vec2() : tex), texCnt++;
+      }
     }
     else if (lines[i].slice(0, 2) == "f ") {
       let tmp = lines[i].slice(1).trim().split(" ");
       for (let j = 0; tmp[j] != undefined; j++) {
         let tmp2 = tmp[j].trim().split("/");
-        if (Number(tmp2[0]) != NaN)
-          vertArray[vertCnt] = vert(posArray[Number(tmp2[0])], vec3(), texArray.length == 0 ? vec2() : texArray[Number(tmp2[2] == undefined ? tmp2[1] : tmp2[2])]), vertCnt++;
+        if (Number(tmp2[0]) != NaN) {
+          let pos = posArray[Number(tmp2[0])];
+          let tex = texArray.length == 0 ? vec2() : texArray[Number(tmp2[2] == undefined ? tmp2[1] : tmp2[2])];
+
+          let facet = vert((pos == undefined ? vec3() : pos), null, (tex == undefined ? vec2() : tex));
+          vertArray[vertCnt] = (facet == undefined ? vec3() : facet), vertCnt++;
+        }
       }
     }
   }
-  return createPrim(vertArray, null, vertCnt, mat4(), "primFromFile");
+  let prim = autoNormals(createPrim(vertArray, null, vertCnt, mat4(), "primFromFile"));
+  prim.shds = loadShaders(rnd.gl, "default");
+  bufLoad(rnd.gl, prim);
+  rnd.flag = true;
+  rnd.prims[2] = prim;
 }
+*/

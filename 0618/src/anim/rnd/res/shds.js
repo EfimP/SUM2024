@@ -2,9 +2,11 @@ let vs_txt =
 `#version 300 es
 precision highp float;
 in vec3 InPosition;
+in vec2 DrawTexCoord;
 in vec3 InNormal;
     
 out vec3 DrawPos;
+out vec2 DrawTex;
 out vec3 DrawNormal;
 uniform float Time;
 
@@ -22,6 +24,7 @@ void main( void )
     gl_Position = MatrVP * MatrWorld * vec4(InPosition, 1.0);
     DrawPos = vec3(MatrWorld * vec4(InPosition, 1));
     DrawNormal = InNormal;
+    DrawTex = DrawTexCoord;
 }
 `;
 let fs_txt =
@@ -30,6 +33,7 @@ precision highp float;
 out vec4 OutColor;
 
 in vec3 DrawPos;
+in vec2 DrawTex;
 in vec3 DrawNormal;
 uniform float Time;
 uniform vec3 CamLoc;

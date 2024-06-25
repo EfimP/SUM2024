@@ -370,6 +370,7 @@ export class input {
           model.up = model.up.mul(mat4().rotate(rotateX, model.right.normalize()));
         }
 
+
         vecTrans = vecTrans.sub(vec3(prevPos.x, 0, prevPos.z).sub(vec3(newPos.x, 0, newPos.z)).mul(0.001));
         matrTrans = matrTrans.mul(mat4().translate(vec3(newPos.x, 0, newPos.z).sub(vec3(prevPos.x, 0, prevPos.z))));
 
