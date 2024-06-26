@@ -102,7 +102,6 @@ function vec2ToArray(element) {
 function createVertFromFacets(prim) {
     let facets = prim.vertexArray;
     let vertArray = [];
-    let cnt = 0;
 
     for (let i of facets)
         vertArray = vertArray.concat(vec3ToArray(i.pos).concat(vec3ToArray(i.norm)).concat(vec2ToArray(i.texCoord)));
@@ -165,8 +164,8 @@ export function createFigure(rnd, figureName, shdName, size, pos) {
   // Loading shader
   prim.shds = loadShaders(rnd.gl, shdName);
   bufLoad(rnd.gl, prim);
-
-  return prim;
+  rnd.prims[rnd.primCount] = prim;
+  rnd.isPrimDraw[rnd.primCount++] = true;
 }
 
 
@@ -200,8 +199,12 @@ function autoNormals(V, NoofV, Ind, NoofI)
   return prim;
 } // End of 'CreateNormals' function
 
-export async function loadPrim(rnd, name) {
-  const response = await fetch("./cow.obj");
+let iteration = 0;
+
+export async function loadPrim(rnd, path) {
+  iteration = rnd.primCount;
+  rnd.isPrimDraw[rnd.primCount++] = false;
+  const response = await fetch(path);
   const text = await response.text();
   const lines = text.split("\n");
   let posArray = [];
@@ -233,58 +236,7 @@ export async function loadPrim(rnd, name) {
   let prim = createVertFromFacets(autoNormals(posArray, posCnt, indArray, indCnt));
   prim.shds = loadShaders(rnd.gl, "default");
   bufLoad(rnd.gl, prim);
-  rnd.flag = true;
-  rnd.prims[2] = prim;
+  prim.matrWorld = mat4().scale(vec3(0.01));
+  rnd.prims[iteration] = prim;
+  rnd.isPrimDraw[iteration] = true;
 }
-
-
-/*
-export async function loadPrim(rnd, name) {
-  const response = await fetch("./cow.obj")
-  const text = await response.text();
-  const lines = text.split("\n");
-  let posArray = [];
-  let texArray = [];
-  let vertArray = [];
-  let posCnt = 0;
-  let texCnt = 0;
-  let vertCnt = 0;
-
-  for (let i = 0; lines[i] != undefined; i++) {
-    if (lines[i].slice(0, 2) == "v ") {
-      let tmp = lines[i].slice(1, -2).trim().split(" ");
-      if (Number(tmp[0]) != NaN) {
-        let pos = vec3(Number(tmp[0]), Number(tmp[1]), Number(tmp[2]));
-        posArray[posCnt] = (pos == undefined ? vec3() : pos), posCnt++;
-      }
-      else
-        posArray[posCnt] = vec3(), posCnt++;
-    }
-    else if (lines[i].slice(0, 2) == "vt") {
-      let tmp = lines[i].slice(2, -2).trim().split(" ");
-      if (Number(tmp[0]) != NaN) {
-        let tex = vec2(Number(tmp[0]), Number(tmp[1]));
-        texArray[texCnt] = (tex == undefined ? vec2() : tex), texCnt++;
-      }
-    }
-    else if (lines[i].slice(0, 2) == "f ") {
-      let tmp = lines[i].slice(1).trim().split(" ");
-      for (let j = 0; tmp[j] != undefined; j++) {
-        let tmp2 = tmp[j].trim().split("/");
-        if (Number(tmp2[0]) != NaN) {
-          let pos = posArray[Number(tmp2[0])];
-          let tex = texArray.length == 0 ? vec2() : texArray[Number(tmp2[2] == undefined ? tmp2[1] : tmp2[2])];
-
-          let facet = vert((pos == undefined ? vec3() : pos), null, (tex == undefined ? vec2() : tex));
-          vertArray[vertCnt] = (facet == undefined ? vec3() : facet), vertCnt++;
-        }
-      }
-    }
-  }
-  let prim = autoNormals(createPrim(vertArray, null, vertCnt, mat4(), "primFromFile"));
-  prim.shds = loadShaders(rnd.gl, "default");
-  bufLoad(rnd.gl, prim);
-  rnd.flag = true;
-  rnd.prims[2] = prim;
-}
-*/

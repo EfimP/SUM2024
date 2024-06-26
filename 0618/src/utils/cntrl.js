@@ -17,9 +17,9 @@ class _dir {
   }
 }
 
-let allTranslate = mat4();
-
 let model = new _dir(vec3(0, 1, 0), vec3(-1, 0, 0), vec3(0, 0, 1), vec3(0));
+let allTranslate = mat4();
+let speed = 0;
 
 export class input {
   constructor(rnd) {
@@ -319,66 +319,146 @@ export class input {
       camSet(vec3(5), vec3(0), vec3(0, 1, 0));
       return;
     }
-    if (this.ctrlKey) {
-      let matr = mat4();
-      let angleSpeed = 70;
-      let rotateY = 0, rotateX = 0;
-      let speed = 15, dist = 0;
-      let prevPos = model.pos;
-    
-      if (this.ctrlKey) {
-        cam.loc = cam.loc.add(model.forward);
-        if (this.keys["Numpad8"]) {
-          dist = timer.globalDeltaTime * speed * (this.keys["Numpad9"] == true ? 8 : 1);
+    let matr = mat4();
+    let angleSpeed = 70;
+    let rotateY = 0, rotateX = 0;
+    let /*speed = 15,*/ dist = 0;
+    let prevPos = model.pos;
+    const inertConst = 1;
+ 
+    if (!this.keys["Numpad1"]) {
+      // Playing mod
+      cam.loc = cam.loc.add(model.forward);
 
-          camSet(cam.loc.add(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
-          matr = matr.mul(mat4().translate(model.forward.mul(dist)));
-          model.pos = model.pos.mul(mat4().translate(model.forward.mul(dist)));
-          allTranslate = allTranslate.mul(mat4().translate(model.forward.mul(dist)));
-        }
-        if (this.keys["Numpad4"]) {
-          dist = timer.globalDeltaTime * speed * (this.keys["Numpad9"] == true ? 8 : 1);
-
-          camSet(cam.loc.sub(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
-          matr = matr.mul(mat4().translate(model.forward.mul(dist).neg()));
-          model.pos = model.pos.mul(mat4().translate(model.forward.mul(dist).neg()));
-          allTranslate = allTranslate.mul(mat4().translate(model.forward.mul(dist).neg()));
-        }
-        let newPos = model.pos;
-        if (this.keys["ArrowRight"]) {
+      //Rotation
+      if (!(this.keys["KeyD"] && this.keys["KeyA"]))
+        if (this.keys["KeyD"]) {
           rotateY = timer.globalDeltaTime * angleSpeed;
     
           model.forward = model.forward.mul(mat4().rotate(rotateY, model.up.normalize()));
           model.right = model.right.mul(mat4().rotate(rotateY, model.up.normalize()));
         }
-        if (this.keys["ArrowLeft"]) {
+        else if (this.keys["KeyA"]) {
           rotateY = -timer.globalDeltaTime * angleSpeed;
     
           model.forward = model.forward.mul(mat4().rotate(rotateY, model.up.normalize()));
           model.right = model.right.mul(mat4().rotate(rotateY, model.up.normalize()));
         }
-        if (this.keys["ArrowUp"]) {
+      if (!(this.keys["KeyW"] && this.keys["KeyS"]))
+        if (this.keys["KeyW"] && model.pos.y > 0) {
           rotateX = timer.globalDeltaTime * angleSpeed;
     
           model.forward = model.forward.mul(mat4().rotate(rotateX, model.right.normalize()));
           model.up = model.up.mul(mat4().rotate(rotateX, model.right.normalize()));
         }
-        if (this.keys["ArrowDown"]) {
+        else if (this.keys["KeyS"]) {
+          rotateX = -timer.globalDeltaTime * angleSpeed;
+    
+          model.forward = model.forward.mul(mat4().rotate(rotateX, model.right.normalize()));
+          model.up = model.up.mul(mat4().rotate(rotateX, model.right.normalize()));
+        }
+      // Checking position to not to be under ground  
+      if (model.pos.y < 0 && model.forward.y < 0)
+        model.forward = vec3(model.forward.x, 0, model.forward.z), model.pos.y = 0;
+
+      //Scaling translation with inertion
+      if (this.keys["Numpad8"]) {
+        //inertion scaling
+        if (speed < 4000)
+          speed += inertConst;
+
+        // Changing position parameters
+        dist = timer.globalDeltaTime * speed;
+
+        camSet(cam.loc.add(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
+        matr = matr.mul(mat4().translate(model.forward.mul(dist)));
+        model.pos = model.pos.mul(mat4().translate(model.forward.mul(dist)));
+        allTranslate = allTranslate.mul(mat4().translate(model.forward.mul(dist)));
+      }
+      else {
+        // Inertion scaling
+        if (speed > 80 || (model.pos.y <= 0 && speed > 0))
+          speed -= inertConst * 9;
+
+        // Changing position parameters
+        dist = timer.globalDeltaTime * speed;
+
+        camSet(cam.loc.add(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
+        matr = matr.mul(mat4().translate(model.forward.mul(dist)));
+        model.pos = model.pos.mul(mat4().translate(model.forward.mul(dist)));
+        allTranslate = allTranslate.mul(mat4().translate(model.forward.mul(dist)));
+
+        //Plane planning
+        dist = (1 / (timer.globalDeltaTime * speed)) * 0.001;
+        if (model.pos.y > 0){
+          if (model.forward.y < 0.1){
+            camSet(cam.loc.add(vec3(0, -1, 0).mul(dist)), cam.loc.add(vec3(0, -1, 0)), model.up);
+            matr = matr.mul(mat4().translate(vec3(0, -1, 0).mul(dist)));
+            model.pos = model.pos.mul(mat4().translate(vec3(0, -1, 0).mul(dist)));
+            allTranslate = allTranslate.mul(mat4().translate(vec3(0, -1, 0).mul(dist)));    
+          }
+        }
+      }
+      let newPos = model.pos;
+
+      vecTrans = vecTrans.sub(vec3(prevPos.x, 0, prevPos.z).sub(vec3(newPos.x, 0, newPos.z)).mul(0.001));
+      matrTrans = matrTrans.mul(mat4().translate(vec3(newPos.x, 0, newPos.z).sub(vec3(prevPos.x, 0, prevPos.z))));
+
+      camSet(model.pos.sub(model.forward.mul(6)).add(model.up.mul(8)), model.pos.add(model.forward.mul(8)), model.up);
+      return matr.mul(allTranslate.inverse()).mul(mat4().rotate(rotateX, model.right.normalize()).mul(mat4().rotate(rotateY, model.up.normalize()))).mul(allTranslate);
+    }
+    else {
+      // God mod
+      cam.loc = cam.loc.add(model.forward);
+      if (this.keys["Numpad8"]) {
+        dist = timer.globalDeltaTime * speed * (this.keys["Numpad9"] == true ? 8 : 1);
+
+        camSet(cam.loc.add(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
+        matr = matr.mul(mat4().translate(model.forward.mul(dist)));
+        model.pos = model.pos.mul(mat4().translate(model.forward.mul(dist)));
+        allTranslate = allTranslate.mul(mat4().translate(model.forward.mul(dist)));
+      }
+      if (this.keys["Numpad4"]) {
+        dist = timer.globalDeltaTime * speed * (this.keys["Numpad9"] == true ? 8 : 1);
+
+        camSet(cam.loc.sub(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
+        matr = matr.mul(mat4().translate(model.forward.mul(dist).neg()));
+        model.pos = model.pos.mul(mat4().translate(model.forward.mul(dist).neg()));
+        allTranslate = allTranslate.mul(mat4().translate(model.forward.mul(dist).neg()));
+      }
+      let newPos = model.pos;
+      if (!(this.keys["KeyD"] && this.keys["KeyA"]))
+        if (this.keys["KeyD"]) {
+          rotateY = timer.globalDeltaTime * angleSpeed;
+    
+          model.forward = model.forward.mul(mat4().rotate(rotateY, model.up.normalize()));
+          model.right = model.right.mul(mat4().rotate(rotateY, model.up.normalize()));
+        }
+        else if (this.keys["KeyA"]) {
+          rotateY = -timer.globalDeltaTime * angleSpeed;
+    
+          model.forward = model.forward.mul(mat4().rotate(rotateY, model.up.normalize()));
+          model.right = model.right.mul(mat4().rotate(rotateY, model.up.normalize()));
+        }
+      if (!(this.keys["KeyW"] && this.keys["KeyS"]))
+        if (this.keys["KeyW"]) {
+          rotateX = timer.globalDeltaTime * angleSpeed;
+    
+          model.forward = model.forward.mul(mat4().rotate(rotateX, model.right.normalize()));
+          model.up = model.up.mul(mat4().rotate(rotateX, model.right.normalize()));
+        }
+        else if (this.keys["KeyS"]) {
           rotateX = -timer.globalDeltaTime * angleSpeed;
     
           model.forward = model.forward.mul(mat4().rotate(rotateX, model.right.normalize()));
           model.up = model.up.mul(mat4().rotate(rotateX, model.right.normalize()));
         }
 
+      vecTrans = vecTrans.sub(vec3(prevPos.x, 0, prevPos.z).sub(vec3(newPos.x, 0, newPos.z)).mul(0.001));
+      matrTrans = matrTrans.mul(mat4().translate(vec3(newPos.x, 0, newPos.z).sub(vec3(prevPos.x, 0, prevPos.z))));
 
-        vecTrans = vecTrans.sub(vec3(prevPos.x, 0, prevPos.z).sub(vec3(newPos.x, 0, newPos.z)).mul(0.001));
-        matrTrans = matrTrans.mul(mat4().translate(vec3(newPos.x, 0, newPos.z).sub(vec3(prevPos.x, 0, prevPos.z))));
-
-        camSet(model.pos.sub(model.forward.mul(5)).add(model.up.mul(3.5)), model.pos.add(model.forward.mul(2)), model.up);
-        return matr.mul(allTranslate.inverse()).mul(mat4().rotate(rotateX, model.right.normalize()).mul(mat4().rotate(rotateY, model.up.normalize()))).mul(allTranslate);
-      }
-      else 
-        return null;
+      camSet(model.pos.sub(model.forward.mul(6)).add(model.up.mul(8)), model.pos.add(model.forward.mul(8)), model.up);
+      return matr.mul(allTranslate.inverse()).mul(mat4().rotate(rotateX, model.right.normalize()).mul(mat4().rotate(rotateY, model.up.normalize()))).mul(allTranslate);
     }
   } // End of 'responseCamera' function
 } // End of 'input' class

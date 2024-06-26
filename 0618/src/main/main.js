@@ -23,31 +23,11 @@ function resizeCanvasToDisplaySize(rnd) {
   return needResize;
 }
 
-function primsInit(rnd) {
-  rnd.prims = [];
-
-  // Creating first primitive
-  rnd.prims[0] = anim.createFigure(rnd, "cube", "default", 0.8, vec3());
-
-  // Creating second primitive
-  const size = 5000;
-  // Loading shader
-  let img = new Image();
-  img.src = "./moss.jpg";
-  anim.texture(rnd.gl, {img: img, name: "land"});
-  rnd.prims[1] = anim.createFigure(rnd, "quad", "quad", size, vec3(0));
-  
-  rnd.flag = false;
-  rnd.prims[2] = anim.loadPrim(rnd, "./cow.obj");
-
-  return rnd.prims;
-}
-
 function frameBlockBind(rnd) {
   let gl = rnd.gl;
   // Loading matrixes and frame buffer
-  for (let i = 0; rnd.prims[i] != undefined; i++)
-    if (i != 2 || rnd.flag) {
+  for (let i = 0; i < rnd.primCount; i++)
+    if (rnd.oldFlags[i] != rnd.isPrimDraw[i] && rnd.isPrimDraw[i] == true) {
       let prg = rnd.prims[i].shds.prg;
 
       gl.useProgram(prg);
@@ -56,8 +36,26 @@ function frameBlockBind(rnd) {
         rnd.frameUniformBufferIndex);
 
       rnd.matrixReload(rnd.prims[i]);
-    }
 
+      rnd.oldFlags[i] = rnd.isPrimDraw[i];
+    }
+}
+
+function primsInit(rnd) {
+  rnd.prims = [];
+
+  anim.loadPrim(rnd, "./warcraft.obj");
+
+  // Creating first primitive
+  anim.createFigure(rnd, "cube", "default", 0.8, vec3());
+
+  // Creating second primitive
+  const size = 5000;
+  // Loading shader
+  let img = new Image();
+  img.src = "./land.jpg";
+  anim.texture(rnd.gl, {img: img, name: "land"});
+  anim.createFigure(rnd, "quad", "quad", size, vec3());
 }
 
 class _render{
@@ -66,10 +64,12 @@ class _render{
   timer = new anim.Timer;
 
   constructor(canvasId) {
+    //Getting canvas and gl context
     this.canvas = document.getElementById(canvasId);
     const gl = this.canvas.getContext("webgl2");
     this.gl = gl;
 
+    // Checking gl context
     if (gl === null) {
       alert("WebGL2 not supported");
       return;
@@ -83,15 +83,19 @@ class _render{
     this.cam = cam;
 
     // Array of primitives initializing, creating of primitives
-    this.prims = primsInit(this);
+    this.isPrimDraw = [];
+    this.primCount = 0;
+    primsInit(this);
 
     // Frame buffer
     this.frameBuffer = gl.createBuffer();
     gl.bindBuffer(gl.UNIFORM_BUFFER, this.frameBuffer);
     gl.bufferData(gl.UNIFORM_BUFFER, 4 * 4, gl.STATIC_DRAW);
 
-    frameBlockBind(this);
-    this.first = true;
+    // Binding frame buffer, reloading matrixes
+    this.oldFlags = [];
+    for (let i = 0; i < this.primCount; i++)
+      this.oldFlags[i] = false;
 
     // Initializing input system
     this.input = new input(this);
@@ -115,20 +119,17 @@ class _render{
     gl.bindBufferBase(gl.UNIFORM_BUFFER, this.frameUniformBufferIndex, this.frameBuffer);
     
     // Responsing input system
-    if (this.input.ctrlKey) {
-      this.newMatrWorld = this.input.responseCamera(this.timer);
-      if (this.newMatrWorld != null) {
-        this.prims[0].matrWorld = this.prims[0].matrWorld.mul(this.newMatrWorld);
-        this.cam = cam;
-        //console.log("Camera position:", cam.loc);
-      }
+    this.newMatrWorld = this.input.responseCamera(this.timer);
+    if (this.newMatrWorld != null && this.isPrimDraw[0] == true) {
+      this.prims[0].matrWorld = this.prims[0].matrWorld.mul(this.newMatrWorld);
+      this.cam = cam;
+      //console.log("Camera position:", cam.loc);
     }
 
-    if (this.flag && this.first)
-      frameBlockBind(this), this.first = false;
+    frameBlockBind(this);
 
-    for (let i = 0; this.prims[i] != undefined; i++)
-      if (i != 2 || this.flag) {
+    for (let i = 0; i < this.primCount; i++)
+      if (this.isPrimDraw[i] == true) {
         let prg = this.prims[i].shds.prg;
 
         if (this.prims[i].name == "quad")
