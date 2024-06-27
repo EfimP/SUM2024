@@ -44,16 +44,17 @@ function frameBlockBind(rnd) {
 function primsInit(rnd) {
   rnd.prims = [];
 
+  //loading plane
   anim.loadPrim(rnd, "./warcraft.obj");
 
-  // Creating first primitive
+  // Creating cube
   anim.createFigure(rnd, "cube", "default", 0.8, vec3());
 
-  // Creating second primitive
+  // Creating ground
   const size = 5000;
-  // Loading shader
+  // Loading texture
   let img = new Image();
-  img.src = "./land.jpg";
+  img.src = "./road.jpg";
   anim.texture(rnd.gl, {img: img, name: "land"});
   anim.createFigure(rnd, "quad", "quad", size, vec3());
 }

@@ -20,6 +20,9 @@ class _dir {
 let model = new _dir(vec3(0, 1, 0), vec3(-1, 0, 0), vec3(0, 0, 1), vec3(0));
 let allTranslate = mat4();
 let speed = 0;
+let step = 0;
+let newSpeed = 0;
+let inertSpeed = 250;
 
 export class input {
   constructor(rnd) {
@@ -330,6 +333,24 @@ export class input {
       // Playing mod
       cam.loc = cam.loc.add(model.forward);
 
+      const input = document.querySelector("#sp_input");
+      input.addEventListener("input", (event) => {
+        newSpeed = event.target.value;
+        step = (newSpeed - speed) / 500;
+      });
+
+      if ((speed < newSpeed && step > 0) || (speed > newSpeed && step < 0))
+        speed += step;
+
+      // Changing position
+      dist = timer.globalDeltaTime * speed;
+
+      camSet(cam.loc.add(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
+      matr = matr.mul(mat4().translate(model.forward.mul(dist)));
+      model.pos = model.pos.mul(mat4().translate(model.forward.mul(dist)));
+      allTranslate = allTranslate.mul(mat4().translate(model.forward.mul(dist)));
+
+
       //Rotation
       if (!(this.keys["KeyD"] && this.keys["KeyA"]))
         if (this.keys["KeyD"]) {
@@ -357,47 +378,38 @@ export class input {
           model.forward = model.forward.mul(mat4().rotate(rotateX, model.right.normalize()));
           model.up = model.up.mul(mat4().rotate(rotateX, model.right.normalize()));
         }
+
+
       // Checking position to not to be under ground  
       if (model.pos.y < 0 && model.forward.y < 0)
         model.forward = vec3(model.forward.x, 0, model.forward.z), model.pos.y = 0;
 
-      //Scaling translation with inertion
-      if (this.keys["Numpad8"]) {
-        //inertion scaling
-        if (speed < 4000)
-          speed += inertConst;
+      // Planning of plane
+      if (model.pos.y > 0 && speed <= 250) {
+        if (model.forward.y < 0) {
+          let dir = model.forward.mul(0.9).add(model.up.neg().mul(0.1));
 
-        // Changing position parameters
-        dist = timer.globalDeltaTime * speed;
+          // Changing position
+          dist = timer.globalDeltaTime * inertSpeed;
 
-        camSet(cam.loc.add(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
-        matr = matr.mul(mat4().translate(model.forward.mul(dist)));
-        model.pos = model.pos.mul(mat4().translate(model.forward.mul(dist)));
-        allTranslate = allTranslate.mul(mat4().translate(model.forward.mul(dist)));
-      }
-      else {
-        // Inertion scaling
-        if (speed > 80 || (model.pos.y <= 0 && speed > 0))
-          speed -= inertConst * 9;
-
-        // Changing position parameters
-        dist = timer.globalDeltaTime * speed;
-
-        camSet(cam.loc.add(model.forward.mul(dist)), cam.loc.add(model.forward), model.up);
-        matr = matr.mul(mat4().translate(model.forward.mul(dist)));
-        model.pos = model.pos.mul(mat4().translate(model.forward.mul(dist)));
-        allTranslate = allTranslate.mul(mat4().translate(model.forward.mul(dist)));
-
-        //Plane planning
-        dist = (1 / (timer.globalDeltaTime * speed)) * 0.001;
-        if (model.pos.y > 0){
-          if (model.forward.y < 0.1){
-            camSet(cam.loc.add(vec3(0, -1, 0).mul(dist)), cam.loc.add(vec3(0, -1, 0)), model.up);
-            matr = matr.mul(mat4().translate(vec3(0, -1, 0).mul(dist)));
-            model.pos = model.pos.mul(mat4().translate(vec3(0, -1, 0).mul(dist)));
-            allTranslate = allTranslate.mul(mat4().translate(vec3(0, -1, 0).mul(dist)));    
-          }
+          camSet(cam.loc.add(dir.mul(dist)), cam.loc.add(model.forward), model.up);
+          matr = matr.mul(mat4().translate(dir.mul(dist)));
+          model.pos = model.pos.mul(mat4().translate(dir.mul(dist)));
+          allTranslate = allTranslate.mul(mat4().translate(dir.mul(dist)));
         }
+        /*
+        else {
+          let dir = model.forward.mul(0.1).add(model.up.neg().mul(0.9));
+
+          // Changing position
+          dist = timer.globalDeltaTime * inertSpeed;
+
+          camSet(cam.loc.add(dir.mul(dist)), cam.loc.add(model.forward), model.up);
+          matr = matr.mul(mat4().translate(dir.mul(dist)));
+          model.pos = model.pos.mul(mat4().translate(dir.mul(dist)));
+          allTranslate = allTranslate.mul(mat4().translate(dir.mul(dist)));
+        }
+          */
       }
       let newPos = model.pos;
 

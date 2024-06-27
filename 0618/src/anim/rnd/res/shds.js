@@ -48,7 +48,7 @@ void main( void )
     vec3 V = normalize(DrawPos - CamLoc);
     vec3 N = normalize(DrawNormal);
     vec3 L = normalize(vec3(1/* + 8 * sin(Time * 5)*/, 1, 1));
-    vec3 color = vec3(0.2, 0.3, 0.7);
+    vec3 color = vec3(0.2, 0.2, 0.2);
 
     N = faceforward(N, V, N);
 
@@ -59,9 +59,11 @@ void main( void )
     vec3 R = reflect(V, N);
     color += vec3(0.1, 0.2, 0.3) * max(0.0, pow(dot(R, L), 1.0));
 
+    /*
     if (pow(abs(sin(Time + DrawPos.x * 0.7)), 2000.0) > 0.3 || 
         pow(abs(sin(Time + DrawPos.z * 0.7)), 2000.0) > 0.3)
         color = vec3(0, 1, 0);
+        */
     //color += vec3(0, 1, 0) * pow(abs(sin(Time + DrawPos.x * 0.7)), 2000.0);
 
     OutColor = vec4(color, 1);

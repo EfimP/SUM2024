@@ -59,7 +59,7 @@ class _vec3 {
         return vec3(this.x, this.y, this.z);
     } // End of 'div' function
 
-    neg(v) {
+    neg() {
         return vec3(-this.x, - this.y, -this.z);
     } // End of 'neg' function
 

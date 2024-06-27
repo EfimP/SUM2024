@@ -22,11 +22,18 @@
                 left: 10px;
                 z-index: 999999999999999999;
             }
+            #sp_input {
+                position: absolute;
+                top: 50%;
+                left: 95%;
+                z-index: 999999999999999999;
+            }
         </style>
     </head>
     <body>
         <div>
             <div id="__fps">FPS: <div id="fps">30</div></div>
+            <input type="range" id="sp_input" min="0" max="500" step="2" value="0">
             <canvas id="glcanvas" onmousewheel="wheel(this, event)"></canvas>
          </div>
         <script>
@@ -37,7 +44,8 @@
         </script>
         <script type="module">
             $(document).ready(function () {
-
+                $("#sp_input").css("transform", "rotate(-90deg)").css("transform-origin", "75px 75px")/*.css("height", "100px")*///.css("border-radius", "10px");
+                //width: 25px;
             })
         </script>
     </body>
