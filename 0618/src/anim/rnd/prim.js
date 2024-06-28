@@ -236,7 +236,7 @@ export async function loadPrim(rnd, path) {
   let prim = createVertFromFacets(autoNormals(posArray, posCnt, indArray, indCnt));
   prim.shds = loadShaders(rnd.gl, "default");
   bufLoad(rnd.gl, prim);
-  prim.matrWorld = mat4().scale(vec3(0.01));
+  prim.matrWorld = mat4().scale(vec3(0.5)).mul(mat4().rotateY(90)).mul(mat4().translate(vec3(0, 5, 0)));
   rnd.prims[iteration] = prim;
   rnd.isPrimDraw[iteration] = true;
 }

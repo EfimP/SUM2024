@@ -45,7 +45,7 @@ function primsInit(rnd) {
   rnd.prims = [];
 
   //loading plane
-  anim.loadPrim(rnd, "./warcraft.obj");
+  anim.loadPrim(rnd, "./jet2.obj");
 
   // Creating cube
   anim.createFigure(rnd, "cube", "default", 0.8, vec3());
@@ -200,4 +200,4 @@ class _render{
 window.addEventListener("load", () => {
   const rnd = new _render("glcanvas");
   rnd.mainLoop();
-});
+}); 

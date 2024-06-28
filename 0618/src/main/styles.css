@@ -1,0 +1,135 @@
+#glcanvas{
+  width: 100%;
+  height: 100%;
+}
+#__fps {
+  position: absolute;
+  top: 19px;
+  left: 10px;
+  z-index: 1;
+}
+#sp_input {
+  position: absolute;
+  top: 50%;
+  left: 95%;
+  z-index: 1;
+}
+#GameInterface{
+  position:absolute;
+  width: 100%;
+  height: 100%;
+}
+#SplashScreen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #1e1d1d;
+  z-index: 999999999999999999;
+}
+#StartButton{
+  position: absolute;
+  margin-left:-50%;
+  width: 240px;
+  height: 60px;
+  border-radius: 27px;
+  border-color: transparent;
+  background-color: transparent;
+  z-index: 2;
+}
+#projectName {
+  margin-top: 25%;
+  margin-left: 44%;
+}
+
+:root {
+  --color-background: #000119;
+  --stroke-width: calc(1em / 16);
+  --font-size: 10vmin;
+  --font-weight: 700;
+  --letter-spacing: calc(1em / 8);
+}
+
+body {
+  background-color: var(--color-background);
+  font-family: Poppins, sans-serif;
+  overflow: hidden;
+}
+
+h1 {
+  position: absolute;
+  top: 0%;
+  left: -7%;
+  background-clip: text;
+  background-image: linear-gradient(to right, #09f1b8, #00a2ff, #ff00d2, #fed90f);
+  color: var(--color-background);
+  font-size: var(--font-size);
+  font-weight: var(--font-weight);
+  letter-spacing: var(--letter-spacing);
+  padding: calc(--stroke-width / 2);
+  -webkit-text-stroke-color: transparent;
+  -webkit-text-stroke-width: var(--stroke-width);
+}
+
+.btn-liquid {
+  display: inline-block;
+  position: absolute;
+  margin-left:40%;
+  top: 70%;
+  width: 240px;
+  height: 60px;
+  border-radius: 27px;
+
+  background-color: #1e1d1d;
+  color: #1e1d1d;
+  font: 700 14px/60px "Droid Sans", sans-serif;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.btn-liquid canvas {
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  bottom: -50px;
+  left: -50px;
+
+  z-index: 1;
+}
+
+.slider {
+  -webkit-appearance: none;
+  position: absolute;
+  margin-top: 12%;
+  left: 95%;
+  z-index: 1;
+  width: 30%;
+  height: 15px;
+  background: #000;
+  outline: none;
+  border: 5px solid lawngreen;
+  border-radius: 8px;
+}
+
+/* for chrome/safari */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 60px;
+  background: #000;
+  cursor: pointer;
+  border: 5px solid lawngreen;
+  border-radius: 4px;
+}
+
+/* for firefox */
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 60px;
+  background: #000;
+  cursor: pointer;
+  border: 5px solid lawngreen;
+  border-radius: 4px;
+}

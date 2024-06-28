@@ -416,7 +416,7 @@ export class input {
       vecTrans = vecTrans.sub(vec3(prevPos.x, 0, prevPos.z).sub(vec3(newPos.x, 0, newPos.z)).mul(0.001));
       matrTrans = matrTrans.mul(mat4().translate(vec3(newPos.x, 0, newPos.z).sub(vec3(prevPos.x, 0, prevPos.z))));
 
-      camSet(model.pos.sub(model.forward.mul(6)).add(model.up.mul(8)), model.pos.add(model.forward.mul(8)), model.up);
+      camSet(model.pos.sub(model.forward.mul(9)).add(model.up.mul(10)), model.pos.add(model.forward.mul(8)), model.up);
       return matr.mul(allTranslate.inverse()).mul(mat4().rotate(rotateX, model.right.normalize()).mul(mat4().rotate(rotateY, model.up.normalize()))).mul(allTranslate);
     }
     else {
